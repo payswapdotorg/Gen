@@ -1,0 +1,15 @@
+{
+  "publicationId": "pub.video-profile-reference-replacement",
+  "gapId": "gap.forced-failure-video-character-replacement",
+  "capabilityId": "video.profile-reference-replacement",
+  "mappings": [
+    {
+      "providerId": "higgsfield",
+      "modelId": "genjutsu",
+      "executionAdapter": "higgsfield-http",
+      "maturity": "reference"
+    }
+  ],
+  "publishedAt": "2026-10-04T10:00:00.000Z",
+  "registryIngestRef": "media-capabilities/registry-ingest"
+}

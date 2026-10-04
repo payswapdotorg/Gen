@@ -1,0 +1,8 @@
+{
+  "sessionId": "session.t4-arena-review",
+  "gapIds": ["gap.forced-failure-video-character-replacement"],
+  "decision": "propose-capability",
+  "proposedCapabilityId": "video.profile-reference-replacement",
+  "rationale": "Phase-1 simulation fixture: the character-replacement goal class fails on profile-view-only references because every existing video.character-replacement mapping rejects them under the cheapest-reliable policy (identity-preservation below threshold). Proposing a dedicated capability that treats reference class as a first-class input, so profile-view inputs route to a mapping tuned for them instead of failing the frontal-tuned gate.",
+  "recordedAt": "2026-10-04T09:00:00.000Z"
+}

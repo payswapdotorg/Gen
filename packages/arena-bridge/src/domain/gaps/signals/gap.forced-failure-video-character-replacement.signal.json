@@ -1,0 +1,26 @@
+{
+  "gapId": "gap.forced-failure-video-character-replacement",
+  "detectedAt": "2026-10-04T00:01:01.000Z",
+  "requestedCapability": {
+    "intent": "Replace the interviewed actor with the user's character across the documentary sequence. (capability video.character-replacement)",
+    "capabilityId": "video.character-replacement",
+    "parameters": {}
+  },
+  "kind": "mapping-shortfall",
+  "failureEvidence": {
+    "summary": "Router trace: all candidate mappings rejected under the cheapest-reliable policy — identity-preservation would fall below 80 given only profile-view reference frames.",
+    "routerDecisionTrace": "policy=cheapest-reliable; input-class=profile-view-only-reference; candidates=3; rejected=3 (identity-preservation below threshold).",
+    "comparisonTableRef": "media-capabilities/evaluations/video.character-replacement.comparison.json",
+    "adapterErrorRecords": [],
+    "organizationRunRef": "agent-lab/runs/run-forced-failure-ef3335",
+    "artifactRefs": [
+      "artifacts/art.src-sequence.json",
+      "artifacts/art.character-ref.json"
+    ]
+  },
+  "impact": {
+    "goalClass": "character-replacement-edit",
+    "severity": "medium",
+    "frequency": "Forced by scenario fixture."
+  }
+}

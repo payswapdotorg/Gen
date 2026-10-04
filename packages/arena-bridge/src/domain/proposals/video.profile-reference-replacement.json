@@ -1,0 +1,36 @@
+{
+  "id": "video.profile-reference-replacement",
+  "version": "0.1.0",
+  "status": "draft",
+  "domain": "video",
+  "summary": "Replace a character identity across a source video using profile-view reference frames, for input classes where frontal references are unavailable. Phase-1 Arena proposal fixture for gap.forced-failure-video-character-replacement.",
+  "inputs": [
+    { "name": "sourceVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": ">= 480p, <= 4K, any fps" },
+    { "name": "referenceCharacter", "mediaType": "image/png", "cardinality": "one-or-more", "constraints": "profile-view references accepted; frontal preferred when available" },
+    { "name": "referenceClass", "mediaType": "text/plain", "cardinality": "one", "constraints": "profile-view-only | frontal-available" }
+  ],
+  "outputs": [
+    { "name": "resultVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": "matches source resolution/fps" }
+  ],
+  "parameters": [
+    { "name": "preserveAudio", "type": "boolean", "default": true, "description": "Carry the source audio track." },
+    { "name": "identityStrength", "type": "number", "minimum": 0, "maximum": 1, "default": 0.85, "description": "Identity transfer strength." }
+  ],
+  "qualityDimensions": [
+    { "id": "identity-preservation", "description": "Reference identity fidelity in the output, measured per reference class.", "scale": "0-100" },
+    { "id": "temporal-coherence", "description": "Flicker/coherence across frames.", "scale": "0-100" },
+    { "id": "reference-class-robustness", "description": "Quality retention when only profile-view references are available.", "scale": "0-100" }
+  ],
+  "costModel": { "pricingUnit": "per-second-of-output", "currency": "USD", "notes": "Phase-1 fixture pricing; real pricing lands with the provider mapping conformance." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "higgsfield", "modelId": "genjutsu", "executionAdapter": "higgsfield-http", "maturity": "reference", "conformanceStatus": "unverified", "notes": "Phase-1 fixture mapping — conformance unverified until the runtime harness replays the scenario." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "profile-reference-basic", "path": "packages/arena-bridge/src/domain/conformance/video.profile-reference-replacement/profile-reference-basic.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Proposed by expert session session.t4-arena-review (Phase-1 simulation fixture) to close gap.forced-failure-video-character-replacement: all existing video.character-replacement mappings reject profile-view-only references under the cheapest-reliable policy. Status stays draft (lock §7: active requires TL review + executed conformance)."
+}

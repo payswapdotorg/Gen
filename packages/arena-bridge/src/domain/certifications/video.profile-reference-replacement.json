@@ -1,0 +1,12 @@
+{
+  "capabilityId": "video.profile-reference-replacement",
+  "providerMapping": "higgsfield/genjutsu via higgsfield-http",
+  "scenarioRefs": [
+    "packages/arena-bridge/src/domain/conformance/video.profile-reference-replacement/profile-reference-basic.json"
+  ],
+  "evidenceRef": "packages/arena-bridge/src/domain/proposals/video.profile-reference-replacement.json",
+  "certifiedAt": "2026-10-04T09:45:00.000Z",
+  "gate": "schema + conformance refs + mapping proofs (structural, Phase-1)",
+  "notes": "Structural standard gate validated by the arena-bridge harness; runtime conformance execution belongs to the @gen/media-capabilities harness (Worker 1). The capability stays draft (lock §7).",
+  "provenance": "Phase-1 simulation fixture closing gap.forced-failure-video-character-replacement."
+}
