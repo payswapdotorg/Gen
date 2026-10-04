@@ -11,9 +11,17 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "test": "node --import tsx --test src/tests/*.test.ts"
+  },
+  "dependencies": {
+    "@gen/media-capabilities": "workspace:*",
+    "@gen/timeline": "workspace:*",
+    "zod": "4.6.5"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.19.4",
     "typescript": "^6.0.2"
   }
 }

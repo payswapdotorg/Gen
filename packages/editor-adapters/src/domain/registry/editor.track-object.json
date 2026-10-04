@@ -1,0 +1,35 @@
+{
+  "id": "editor.track-object",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "editor",
+  "summary": "Track a labeled object region through a shot and emit per-frame tracking data as a content-addressed artifact. Launch coverage is thin: only the Blender adapter maps this capability (experimental); the shortfall is recorded as a coverage gap feeding Arena.",
+  "inputs": [
+    { "name": "project", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "project whose first clip provides the tracking source" }
+  ],
+  "outputs": [
+    { "name": "trackingData", "mediaType": "application/vnd.gen.tracking+json", "cardinality": "one", "constraints": "per-frame marker positions/offsets; produced by the adapter's tracking run" }
+  ],
+  "parameters": [
+    { "name": "targetLabel", "type": "string", "description": "Label for the tracked object (becomes the tracker track name)." },
+    { "name": "region", "type": "string", "description": "Seed region as x,y,w,h in source pixels." },
+    { "name": "start", "type": "duration", "unit": "seconds", "minimum": 0, "default": 0, "description": "Tracking start time in the source clip." },
+    { "name": "end", "type": "duration", "unit": "seconds", "minimum": 0, "description": "Tracking end time in the source clip; omit to track to the clip end." }
+  ],
+  "qualityDimensions": [
+    { "id": "track-stability", "description": "Drift of the tracked region across the shot.", "scale": "0-100" },
+    { "id": "coverage", "description": "Fraction of requested frames with tracking data.", "scale": "0-100" }
+  ],
+  "costModel": { "pricingUnit": "compute-minutes", "notes": "Local compute; scales with tracked frame count." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "blender", "executionAdapter": "blender-headless-python", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "Movie clip tracker markers seeded and tracked via generated bpy script. Headless marker-seeding is API-safe; the track_markers operator's headless availability is unverified in the Phase 1 sandbox (blender binary absent) — see gap.editor-track-object-launch-coverage." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "seed-marker", "path": "packages/editor-adapters/src/domain/conformance/editor.track-object/seed-marker.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "editor-adapter-contract.md §4: track-object outputs land as artifacts. Launch-set coverage shortfall is committed as gap.editor-track-object-launch-coverage (kind editor-coverage-gap) — MLT's vidstab provides stabilization not object tracking; Natron tracker setup is GUI-oriented in the declared scripting surface; FFmpeg/Kdenlive/LosslessCut expose no headless tracking."
+}

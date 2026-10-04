@@ -1,0 +1,48 @@
+{
+  "editorId": "mlt",
+  "evaluatedAt": "2026-10-04",
+  "selectedMode": "cli",
+  "modeComparison": [
+    {
+      "mode": "cli",
+      "viability": "viable (declared; live run pending binary)",
+      "startupCost": { "class": "subsecond", "measuredMs": null, "note": "melt binary absent in Phase 1 sandbox — cold start not measured; declared subsecond for a native C++ CLI. Structural pipeline measured: open 3.0ms, apply(cut) 5.0ms, exportOtio 2.0ms." },
+      "determinism": "deterministic argv from a deterministic project document; MLT render output depends on codec/profile but the invocation is byte-stable per revision",
+      "sandboxability": "high — plain process spawn, cwd-scoped, no GUI, no daemon, no network",
+      "errorSurfacing": "exit code + stderr captured per run; mapped onto the shared taxonomy (provider-internal default, validation on exit 2)",
+      "artifactFidelity": "frame-grid quantization (in/out inclusive frames) — declared in codec fidelity notes",
+      "evidence": [
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (mlt cut + cross-editor exchange, passed)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (mlt live render — SKIPPED, melt absent)" },
+        { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
+      ]
+    },
+    {
+      "mode": "embedded",
+      "viability": "conditional",
+      "note": "libmlt++ exists but would add a native binding to the Node runtime for no Phase 1 gain; revisit only if a tight-loop use case appears",
+      "startupCost": { "class": "subsecond", "measuredMs": null, "note": "not evaluated (no binding implemented)" },
+      "determinism": "n/a — not implemented",
+      "sandboxability": "in-process; a crash takes the host down with it",
+      "errorSurfacing": "exceptions in-process",
+      "artifactFidelity": "identical engine to CLI"
+    },
+    {
+      "mode": "mcp",
+      "viability": "not evaluated in Phase 1",
+      "note": "an MCP server wrapping the adapter is Phase 2+ routing work (agent-native surface); the adapter interface is transport-agnostic by design"
+    },
+    {
+      "mode": "remote-service",
+      "viability": "viable pattern (not built)",
+      "note": "the BaseEditorAdapter ports (ProcessPort/FsPort/ArtifactStorePort) are exactly the seam a remote render service implements; no Phase 1 deliverable"
+    }
+  ],
+  "capabilities": [
+    { "capabilityId": "editor.cut-video", "maturity": "stable" },
+    { "capabilityId": "editor.composite-layer", "maturity": "stable" },
+    { "capabilityId": "editor.render-project", "maturity": "stable" }
+  ],
+  "binaryNames": ["melt"],
+  "liveConformance": "skipped (melt absent in Phase 1 sandbox); structural + OTIO conformance passed"
+}

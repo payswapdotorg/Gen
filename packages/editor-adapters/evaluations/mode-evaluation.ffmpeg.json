@@ -1,0 +1,46 @@
+{
+  "editorId": "ffmpeg",
+  "evaluatedAt": "2026-10-04",
+  "selectedMode": "cli",
+  "modeComparison": [
+    {
+      "mode": "cli",
+      "viability": "viable — LIVE VERIFIED in the Phase 1 sandbox (ffmpeg + ffprobe present)",
+      "startupCost": { "class": "subsecond", "measuredMs": 57, "note": "measured: `ffmpeg -version` cold start 56.8–74.8ms across three runs; ffprobe duration probe 57.9–59.7ms; structural ops: open 4.1ms, apply(cut) 1.7ms, exportOtio 1.2ms." },
+      "determinism": "deterministic argv compiled from the EDL; x264 with fixed preset/CRF is not byte-deterministic across versions but is reproducible per (version, args); stream-copy is byte-stable",
+      "sandboxability": "high — plain process spawn, cwd-scoped, no GUI, no daemon, no network; the avfilter graph is fully declarative",
+      "errorSurfacing": "precise: exit codes + stderr parsed per run; missing binaries surface as unsupported/binary-missing before spawn",
+      "artifactFidelity": "seconds-precision ranges; transform subset x/y/scale (rotation approximated); stream-copy cuts keyframe-aligned — all declared in codec fidelity notes",
+      "evidence": [
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/ffmpeg-live.test.ts — basic-cut reencode (duration 1.9–2.1s PASS), basic-cut stream-copy (keyframe-aligned PASS), basic-render lifecycle + lineage PASS, render idempotency PASS — all executed live" },
+        { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (cold start 56.8ms, fixture gen 73.6ms, live 1s cut+render end-to-end 107ms)" }
+      ]
+    },
+    {
+      "mode": "embedded",
+      "viability": "conditional",
+      "note": "ffmpeg.wasm / node bindings exist; native binding adds build complexity for no Phase 1 gain — revisit for a tight-loop preview pipeline",
+      "startupCost": { "class": "subsecond", "measuredMs": null, "note": "not measured (no binding implemented)" },
+      "determinism": "same engine, no process boundary",
+      "sandboxability": "in-process; codec crash risk moves into the host",
+      "errorSurfacing": "return codes in-process",
+      "artifactFidelity": "identical"
+    },
+    {
+      "mode": "mcp",
+      "viability": "not evaluated in Phase 1",
+      "note": "the CLI argv surface maps 1:1 onto MCP tool params; a thin MCP wrapper is a Phase 2+ routing concern"
+    },
+    {
+      "mode": "remote-service",
+      "viability": "viable pattern (not built)",
+      "note": "render-farm-shaped; the adapter ports are the seam"
+    }
+  ],
+  "capabilities": [
+    { "capabilityId": "editor.cut-video", "maturity": "stable" },
+    { "capabilityId": "editor.render-project", "maturity": "stable" }
+  ],
+  "binaryNames": ["ffmpeg"],
+  "liveConformance": "passed (scenarios basic-cut × 2 modes, basic-render + idempotency — ffmpeg 6/7 class binary in sandbox, real renders + ffprobe-verified durations)"
+}

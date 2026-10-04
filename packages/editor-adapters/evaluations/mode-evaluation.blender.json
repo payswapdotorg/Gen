@@ -1,0 +1,44 @@
+{
+  "editorId": "blender",
+  "evaluatedAt": "2026-10-04",
+  "selectedMode": "cli",
+  "modeComparison": [
+    {
+      "mode": "cli",
+      "viability": "viable (declared; live run pending binary)",
+      "startupCost": { "class": "seconds", "measuredMs": null, "note": "blender binary absent in Phase 1 sandbox. Blender --background cold start is seconds-class (Python interpreter + bpy init) — declared, not measured. Structural pipeline measured: open 1.4ms, exportOtio 1.5ms; script generation is pure string building (no process)." },
+      "determinism": "deterministic script + JSON bundle per revision; render determinism depends on Blender's animation system (stable for VSE strips)",
+      "sandboxability": "high — --background is the documented headless mode; cwd-scoped; no GUI, no network",
+      "errorSurfacing": "exit code + full stdout/stderr captured; the generated script writes tracking.json reporting what the headless run actually achieved (never fabricated)",
+      "artifactFidelity": "frame-grid quantization; VSE strip transform carries offset/scale (rotation declared); tracking ops are blender-native extensions (dropped on OTIO export — declared)",
+      "evidence": [
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (blender animation round-trip + import into all editors, passed)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (blender live render — SKIPPED, blender absent)" },
+        { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
+      ]
+    },
+    {
+      "mode": "embedded",
+      "viability": "not viable",
+      "note": "bpy is not embeddable into Node without a Python runtime bridge; the CLI is the only sanctioned headless surface"
+    },
+    {
+      "mode": "mcp",
+      "viability": "not evaluated in Phase 1",
+      "note": "Blender ships bpy as a Python module — an MCP server could host bpy in-process in a Python service; out of Phase 1 scope, noted as the strongest future mcp candidate"
+    },
+    {
+      "mode": "remote-service",
+      "viability": "viable pattern (not built)",
+      "note": "render-farm-shaped (Blender farms are standard); the adapter ports are the seam"
+    }
+  ],
+  "capabilities": [
+    { "capabilityId": "editor.create-animation", "maturity": "experimental" },
+    { "capabilityId": "editor.composite-layer", "maturity": "experimental" },
+    { "capabilityId": "editor.render-project", "maturity": "experimental" },
+    { "capabilityId": "editor.track-object", "maturity": "experimental" }
+  ],
+  "binaryNames": ["blender"],
+  "liveConformance": "skipped (blender absent in Phase 1 sandbox); structural + OTIO conformance passed; see gap.editor-track-object-launch-coverage"
+}

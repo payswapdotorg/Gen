@@ -1,0 +1,41 @@
+{
+  "id": "basic-composite",
+  "capabilityId": "editor.composite-layer",
+  "description": "Composite a 1s layer asset at opacity 0.5 over a 2s base project and verify the OTIO projection carries two video tracks with the layer clip, plus per-adapter native fidelity declarations. Render-level verification runs only where binaries are present.",
+  "requiresBinaries": {
+    "fixtureGeneration": ["ffmpeg"],
+    "render": {
+      "mlt": ["melt"],
+      "blender": ["blender"],
+      "natron": ["NatronRenderer", "natron"],
+      "ffmpeg": ["ffmpeg"]
+    }
+  },
+  "adaptersUnderTest": ["mlt", "blender", "natron", "ffmpeg"],
+  "fixture": {
+    "kind": "ffmpeg-generated-pair",
+    "base": {
+      "generationArgs": ["-f", "lavfi", "-i", "testsrc2=duration=2:size=320x240:rate=25", "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"],
+      "mediaType": "video/mp4",
+      "probeMetadata": { "durationSeconds": 2, "fps": 25, "width": 320, "height": 240 }
+    },
+    "layer": {
+      "generationArgs": ["-f", "lavfi", "-i", "color=c=red:duration=1:size=160x120:rate=25", "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"],
+      "mediaType": "video/mp4",
+      "probeMetadata": { "durationSeconds": 1, "fps": 25, "width": 160, "height": 120 }
+    }
+  },
+  "params": { "layerArtifactRef": "<layer-artifact-id>", "trackIndex": 1, "opacity": 0.5, "transform": "80,60,1,0" },
+  "expectedInvariants": {
+    "otio": {
+      "videoTrackCount": 2,
+      "layerClipOnTrack": 1,
+      "layerOpacity": 0.5
+    },
+    "output": {
+      "exists": true,
+      "durationSecondsRange": [1.9, 2.1]
+    }
+  },
+  "notes": "layerArtifactRef is bound at runtime to the ingested layer artifact id. Structural invariants (OTIO) always run; render invariants are binary-gated."
+}

@@ -1,0 +1,32 @@
+{
+  "gapId": "gap.losslesscut-headless-cut",
+  "detectedAt": "2026-10-04T09:20:00.000Z",
+  "requestedCapability": {
+    "intent": "Cut a video losslessly by driving LosslessCut without a GUI session (project authoring plus export execution).",
+    "capabilityId": "editor.cut-video",
+    "parameters": {
+      "providerId": "losslesscut",
+      "executionAdapter": "losslesscut-project",
+      "operation": "render/export"
+    }
+  },
+  "kind": "editor-coverage-gap",
+  "failureEvidence": {
+    "summary": "LosslessCut is a GUI-first Electron application. Its project JSON (cut segments) can be authored headlessly and is supported by the losslesscut adapter as the native project format, but executing the segment export has no stable headless surface: export runs through the Electron renderer and no documented CLI performs it. Per ARCHITECTURE_LOCK.md P5 and the editor-adapter-contract.md §4 (GUI-only interactions are NOT capabilities), the adapter implements authoring only and render() fails with error kind 'unsupported', code 'render-surface-absent', referencing this gap. No GUI automation workaround was implemented.",
+    "adapterErrorRecords": [
+      "editor-adapters losslesscut renderPlan: reason=no-render-surface, gapId=gap.losslesscut-headless-cut (render surface absent; authoring-only adapter)"
+    ],
+    "artifactRefs": [
+      "packages/editor-adapters/src/domain/adapters/losslesscut.ts",
+      "packages/editor-adapters/evaluations/mode-evaluation.losslesscut.json"
+    ]
+  },
+  "impact": {
+    "goalClass": "lossless-cut",
+    "severity": "medium",
+    "frequency": "Every editor.cut-video routing decision that prefers the losslesscut provider (cheapest-reliable/local-first policies) — falls back to ffmpeg stream-copy (keyframe-aligned) or mlt reencode instead."
+  },
+  "arena": {
+    "state": "detected"
+  }
+}

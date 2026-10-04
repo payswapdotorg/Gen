@@ -1,0 +1,39 @@
+{
+  "id": "basic-cut",
+  "capabilityId": "editor.cut-video",
+  "description": "Trim the single clip of a generated 4s/25fps/320x240 project to [1s, 3s) and verify the OTIO projection (1 track, 1 clip, 2s duration) plus, where the adapter's render binary is present, a rendered output with duration in [1.9s, 2.1s].",
+  "requiresBinaries": {
+    "fixtureGeneration": ["ffmpeg"],
+    "render": {
+      "ffmpeg": ["ffmpeg"],
+      "mlt": ["melt"],
+      "kdenlive": ["melt", "kdenlive_render"],
+      "losslesscut": []
+    }
+  },
+  "adaptersUnderTest": ["ffmpeg", "mlt", "kdenlive", "losslesscut"],
+  "fixture": {
+    "kind": "ffmpeg-generated",
+    "generationArgs": [
+      "-f", "lavfi", "-i", "testsrc2=duration=4:size=320x240:rate=25",
+      "-f", "lavfi", "-i", "sine=frequency=440:duration=4",
+      "-c:v", "libx264", "-preset", "ultrafast", "-g", "25", "-pix_fmt", "yuv420p",
+      "-c:a", "aac", "-shortest"
+    ],
+    "mediaType": "video/mp4",
+    "probeMetadata": { "durationSeconds": 4, "fps": 25, "width": 320, "height": 240 }
+  },
+  "params": { "clipIndex": 0, "start": 1, "end": 3, "mode": "reencode" },
+  "expectedInvariants": {
+    "otio": {
+      "trackCount": 1,
+      "clipCount": 1,
+      "clipDurationsSeconds": [2]
+    },
+    "output": {
+      "exists": true,
+      "durationSecondsRange": [1.9, 2.1]
+    }
+  },
+  "notes": "Structural (OTIO) invariants run for every adapter without binaries. Render invariants run only where the adapter's binary is present; results are recorded per adapter in the completion report (honest numbers, lock P5). losslesscut has no render surface — its scenario asserts the declared unsupported failure with gap gap.losslesscut-headless-cut."
+}

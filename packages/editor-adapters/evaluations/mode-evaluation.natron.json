@@ -1,0 +1,42 @@
+{
+  "editorId": "natron",
+  "evaluatedAt": "2026-10-04",
+  "selectedMode": "cli",
+  "modeComparison": [
+    {
+      "mode": "cli",
+      "viability": "viable per declared contract (live run pending binary — NatronRenderer/natron absent in Phase 1 sandbox)",
+      "startupCost": { "class": "seconds", "measuredMs": null, "note": "not measured (binary absent). NatronRenderer is a full compositing engine — startup is seconds-class, declared. Structural pipeline measured: open 1.3ms, exportOtio 1.3ms." },
+      "determinism": "deterministic generated Python script (Read→Transform→Merge→Write graph) per revision; render determinism unverified without the binary",
+      "sandboxability": "high — NatronRenderer is the documented headless binary; cwd-scoped; no GUI",
+      "errorSurfacing": "exit code + stdout/stderr captured; Python exceptions inside the script appear in stderr and fail the job",
+      "artifactFidelity": "layer-stack model (not timeline-oriented): record placement beyond the composite stack is dropped, transform x/y/scale/rotation map to the Transform node — declared in codec fidelity notes",
+      "evidence": [
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (natron import of ffmpeg-exported OTIO, passed)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (natron live composite — SKIPPED, binaries absent)" },
+        { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
+      ]
+    },
+    {
+      "mode": "embedded",
+      "viability": "not viable",
+      "note": "Natron's Python API only runs inside the Natron process; no out-of-process embedding exists"
+    },
+    {
+      "mode": "mcp",
+      "viability": "not evaluated in Phase 1",
+      "note": "Natron's Python host could expose an MCP server, but that is a Natron-side plugin project — out of scope"
+    },
+    {
+      "mode": "remote-service",
+      "viability": "viable pattern (not built)",
+      "note": "compositing render farms are the natural shape; the adapter ports are the seam"
+    }
+  ],
+  "capabilities": [
+    { "capabilityId": "editor.composite-layer", "maturity": "experimental" }
+  ],
+  "binaryNames": ["NatronRenderer", "natron"],
+  "liveConformance": "skipped (binaries absent); plugin ids (fr.inria.natron.Read/Merge/Transform/Write) target Natron 2.x per the declared contract — unverified against a live binary, honestly recorded",
+  "caveats": "script API surface declared from Natron 2.x documentation; first live run at the integration station must confirm createNode ids and param names before this mapping may leave experimental"
+}

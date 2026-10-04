@@ -1,0 +1,24 @@
+{
+  "id": "seed-marker",
+  "capabilityId": "editor.track-object",
+  "description": "Attach a tracking op (target 'ball', region 120,90,40,40, [0.5s, 1.5s]) to a project and verify the op is carried in the native blender bundle and applied to the generated script; the actual tracking execution is binary-gated and its headless status is reported honestly.",
+  "requiresBinaries": {
+    "fixtureGeneration": ["ffmpeg"],
+    "render": {
+      "blender": ["blender"]
+    }
+  },
+  "adaptersUnderTest": ["blender"],
+  "fixture": {
+    "kind": "ffmpeg-generated",
+    "generationArgs": ["-f", "lavfi", "-i", "testsrc2=duration=2:size=320x240:rate=25", "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"],
+    "mediaType": "video/mp4",
+    "probeMetadata": { "durationSeconds": 2, "fps": 25, "width": 320, "height": 240 }
+  },
+  "params": { "targetLabel": "ball", "region": "120,90,40,40", "start": 0.5, "end": 1.5 },
+  "expectedInvariants": {
+    "nativeBundle": { "trackingOpCount": 1, "targetLabel": "ball" },
+    "generatedScript": { "containsTracker": true }
+  },
+  "notes": "See gap.editor-track-object-launch-coverage: the launch set's only tracking mapping is experimental and unverified headless; the scenario asserts what IS verifiable without the binary (op storage, script generation) and gates execution."
+}

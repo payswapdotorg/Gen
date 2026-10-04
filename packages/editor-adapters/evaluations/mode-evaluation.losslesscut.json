@@ -1,0 +1,41 @@
+{
+  "editorId": "losslesscut",
+  "evaluatedAt": "2026-10-04",
+  "selectedMode": "cli",
+  "modeComparison": [
+    {
+      "mode": "cli",
+      "viability": "NOT VIABLE for execution — authoring-only",
+      "startupCost": { "class": "subsecond", "measuredMs": null, "note": "no headless binary exists to start. Structural pipeline measured: open 1.2ms, apply(cut) 1.2ms, exportOtio 1.2ms (project JSON authoring)." },
+      "determinism": "deterministic project JSON (segments list) per revision",
+      "sandboxability": "authoring is pure data (sandboxable); EXECUTION requires the Electron GUI — not sandboxable headless",
+      "errorSurfacing": "render() fails fast with kind=unsupported, code=render-surface-absent, gapId=gap.losslesscut-headless-cut — verified by an executed test",
+      "artifactFidelity": "single-sequence cut segments only (multi-track/transforms/animation not expressible) — declared in codec fidelity notes",
+      "evidence": [
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/adapter-lifecycle.test.ts — losslesscut render fails unsupported with the gap reference (PASS, executed)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts — losslesscut cut authoring + OTIO round-trip (PASS)" },
+        { "kind": "gap-report", "ref": "packages/arena-bridge/src/domain/gaps/gap.losslesscut-headless-cut.json" }
+      ]
+    },
+    {
+      "mode": "embedded",
+      "viability": "not viable",
+      "note": "LosslessCut is an Electron app; no library/embedding surface exists"
+    },
+    {
+      "mode": "mcp",
+      "viability": "not viable without GUI automation",
+      "note": "an MCP surface would still need to drive the GUI renderer — that is the prohibited GUI workaround (lock P5), so it is not proposed"
+    },
+    {
+      "mode": "remote-service",
+      "viability": "conditionally proposed for Arena consideration",
+      "note": "the only execution-shaped option would be a remote service wrapping a real display session — that is GUI automation by another name and remains out of scope per lock P5; recorded in the gap report for Arena to decide (e.g. upstream headless CLI request)"
+    }
+  ],
+  "capabilities": [
+    { "capabilityId": "editor.cut-video", "maturity": "planned", "note": "project JSON authoring only; execution is the documented gap" }
+  ],
+  "binaryNames": [],
+  "liveConformance": "no live surface exists; the negative assertion (render → unsupported + gap) is the verified behavior"
+}

@@ -1,0 +1,32 @@
+{
+  "gapId": "gap.editor-track-object-launch-coverage",
+  "detectedAt": "2026-10-04T09:20:00.000Z",
+  "requestedCapability": {
+    "intent": "Track an object through shots using any launch-set editor adapter with verified headless execution.",
+    "capabilityId": "editor.track-object",
+    "parameters": {
+      "launchSet": ["mlt", "blender", "ffmpeg", "natron", "kdenlive", "losslesscut"]
+    }
+  },
+  "kind": "editor-coverage-gap",
+  "failureEvidence": {
+    "summary": "editor.track-object launch coverage is below the bar: exactly one provider mapping exists (blender, maturity experimental, conformanceStatus unverified) and the Phase 1 sandbox has no blender binary, so no live verification ran. The other launch editors do not expose headless object tracking in their declared surfaces: MLT's vidstab filters provide camera stabilization rather than general object tracking; Natron's tracker node setup is GUI-oriented in the declared scripting surface; FFmpeg, Kdenlive and LosslessCut expose no tracking at all. The blender mapping seeds tracker markers via a generated bpy script (marker insertion is API-safe); whether the track_markers operator completes headless is unverified — the generated script reports what actually happened (tracking.json) instead of fabricating data.",
+    "adapterErrorRecords": [
+      "editor-adapters blender track-object: mapping experimental/unverified — binary absent in Phase 1 sandbox, live scenario skipped (conformance/editor.track-object/seed-marker.json)",
+      "editor-adapters mlt/natron/ffmpeg/kdenlive/losslesscut track-object: capability-not-served (no headless tracking surface in the declared contract)"
+    ],
+    "artifactRefs": [
+      "packages/editor-adapters/src/domain/registry/editor.track-object.json",
+      "packages/editor-adapters/src/domain/adapters/blender.ts",
+      "packages/editor-adapters/src/domain/conformance/editor.track-object/seed-marker.json"
+    ]
+  },
+  "impact": {
+    "goalClass": "object-tracking",
+    "severity": "medium",
+    "frequency": "Any workflow needing tracking data (T2 documentary organizations with follow-cam effects, motion-driven composites) — currently unserved until the blender mapping is verified or a dedicated tracking provider is added."
+  },
+  "arena": {
+    "state": "detected"
+  }
+}

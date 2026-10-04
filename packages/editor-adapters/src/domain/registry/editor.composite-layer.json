@@ -1,0 +1,39 @@
+{
+  "id": "editor.composite-layer",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "editor",
+  "summary": "Composite a layer asset over the project timeline: add the layer as a new clip on a target track with opacity and transform (x, y, scale, rotation), producing a new project revision. Native fidelity of the transform subset is declared per adapter, never silent.",
+  "inputs": [
+    { "name": "project", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "the timeline to composite onto" },
+    { "name": "layer", "mediaType": "video/mp4", "cardinality": "one", "constraints": "content-addressed layer asset with probe metadata (durationSeconds, fps, width, height)" }
+  ],
+  "outputs": [
+    { "name": "updatedProject", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "new immutable project revision with the layer track" }
+  ],
+  "parameters": [
+    { "name": "layerArtifactRef", "type": "artifact-ref", "description": "Artifact id of the layer asset (content-addressed)." },
+    { "name": "trackIndex", "type": "number", "minimum": 0, "default": 1, "description": "Target video track index (0 = V1 base); missing tracks are created." },
+    { "name": "opacity", "type": "number", "minimum": 0, "maximum": 1, "default": 1, "description": "Layer opacity." },
+    { "name": "transform", "type": "string", "description": "Optional tx,ty,scale,rotation tuple (pixels, pixels, ratio, degrees)." }
+  ],
+  "qualityDimensions": [
+    { "id": "compositing-fidelity", "description": "Visual correctness of the composite (blend, transform) against the declared subset.", "scale": "0-100" },
+    { "id": "transform-coverage", "description": "Which of x/y/scale/rotation survive into the native format unchanged.", "scale": "categorical" }
+  ],
+  "costModel": { "pricingUnit": "compute-minutes", "notes": "Composite itself is a project operation; cost is realized at render time." },
+  "latencyClass": "seconds",
+  "providerMappings": [
+    { "providerId": "mlt", "executionAdapter": "mlt-melt-cli", "maturity": "stable", "conformanceStatus": "unverified", "notes": "Multi-track tractor + composite transition (a/b track indices). Live conformance skipped in Phase 1 sandbox (melt absent)." },
+    { "providerId": "blender", "executionAdapter": "blender-headless-python", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "VSE channels with ALPHAOVER blend. Live conformance skipped (blender absent)." },
+    { "providerId": "natron", "executionAdapter": "natron-renderer-cli", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "Read/Merge/Write node graph via NatronRenderer Python script; plugin ids per Natron 2.x declared contract — unverified against a live binary in the Phase 1 sandbox." },
+    { "providerId": "ffmpeg", "executionAdapter": "ffmpeg-cli", "maturity": "stable", "conformanceStatus": "unverified", "notes": "filter_complex overlay + colorchannelmixer chain; x/y/scale supported, rotation approximated (declared lossy in adapter fidelity notes). Structural conformance only in sandbox; render-level conformance pending." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "basic-composite", "path": "packages/editor-adapters/src/domain/conformance/editor.composite-layer/basic-composite.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Launch descriptor (draft per lock §7)."
+}
