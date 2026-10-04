@@ -1,0 +1,24 @@
+{
+  "id": "basic-animation",
+  "capabilityId": "editor.create-animation",
+  "description": "Create an opacity curve (0.0 at 0s → 1.0 at 1s → 0.0 at 2s, linear) on clip-0 and verify the curve survives the native round-trip (serialize → parse) and the OTIO gen-metadata export.",
+  "requiresBinaries": {
+    "fixtureGeneration": ["ffmpeg"],
+    "render": {
+      "blender": ["blender"]
+    }
+  },
+  "adaptersUnderTest": ["blender"],
+  "fixture": {
+    "kind": "ffmpeg-generated",
+    "generationArgs": ["-f", "lavfi", "-i", "testsrc2=duration=2:size=320x240:rate=25", "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p"],
+    "mediaType": "video/mp4",
+    "probeMetadata": { "durationSeconds": 2, "fps": 25, "width": 320, "height": 240 }
+  },
+  "params": { "property": "opacity", "keyframes": "0=0;1=1;2=0", "interpolation": "linear", "target": "clip-0" },
+  "expectedInvariants": {
+    "nativeRoundTrip": { "curveCount": 1, "keyTimesSeconds": [0, 1, 2], "keyValues": [0, 1, 0] },
+    "otio": { "curveCount": 1 }
+  },
+  "notes": "Curve storage and OTIO export are structural (no binary needed); the Blender fcurve realization is binary-gated and skipped in the Phase 1 sandbox."
+}

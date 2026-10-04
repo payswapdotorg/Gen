@@ -1,0 +1,43 @@
+{
+  "editorId": "kdenlive",
+  "evaluatedAt": "2026-10-04",
+  "selectedMode": "cli",
+  "modeComparison": [
+    {
+      "mode": "cli",
+      "viability": "viable (declared; live run pending binary)",
+      "startupCost": { "class": "subsecond", "measuredMs": null, "note": "render executes via melt (kdenlive_render is a melt wrapper) — subsecond cold start declared, not measured (binaries absent). Structural pipeline measured: open 16.3ms (XML flavor build), apply(cut) 1.7ms, exportOtio 1.8ms." },
+      "determinism": "deterministic kdenlive-flavored MLT XML per revision; render via melt avformat consumer",
+      "sandboxability": "high — project XML authoring is pure data; rendering is a plain process spawn; no GUI",
+      "errorSurfacing": "exit code + stderr captured; XML parse failures are precise (path + problem), never guessed",
+      "artifactFidelity": "frame-grid quantization (MLT semantics); kdenlive effect/keyframe model out of the declared subset (dropped on OTIO exchange — declared)",
+      "evidence": [
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (kdenlive cut + import of mlt composite projection, passed)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (kdenlive live render — SKIPPED, binaries absent)" },
+        { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
+      ]
+    },
+    {
+      "mode": "embedded",
+      "viability": "not viable",
+      "note": "kdenlive is a Qt application; no embedding surface exists — the project format + melt engine are the headless path (this adapter)"
+    },
+    {
+      "mode": "mcp",
+      "viability": "not evaluated in Phase 1",
+      "note": "kdenlive's MLT project format is the interchange; an MCP surface would wrap this same adapter"
+    },
+    {
+      "mode": "remote-service",
+      "viability": "viable pattern (not built)",
+      "note": "kdenlive render farms drive melt the same way; the adapter ports are the seam"
+    }
+  ],
+  "capabilities": [
+    { "capabilityId": "editor.cut-video", "maturity": "stable" },
+    { "capabilityId": "editor.render-project", "maturity": "stable" }
+  ],
+  "binaryNames": ["kdenlive_render", "melt"],
+  "liveConformance": "skipped (kdenlive_render and melt absent in Phase 1 sandbox); structural + OTIO conformance passed",
+  "caveats": "kdenlive XML flavor (main_bin doc properties, kdenlive:clipname, kdenlive:track_name) targets kdenlive 24.x documents; verify against a real kdenlive save at the integration station"
+}

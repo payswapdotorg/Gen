@@ -1,0 +1,40 @@
+{
+  "id": "editor.cut-video",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "editor",
+  "summary": "Cut, trim and split clips on the timeline: set a clip's source in/out range on any editor project, preserving the rest of the timeline. Headless adapter operation; frame accuracy depends on the adapter's declared cut mode.",
+  "inputs": [
+    { "name": "project", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "native editor project artifact (adapter-wrapped); or a probed media asset to start a project" },
+    { "name": "sourceMedia", "mediaType": "video/mp4", "cardinality": "zero-or-more", "constraints": "content-addressed, probe metadata attached (durationSeconds, fps, width, height)" }
+  ],
+  "outputs": [
+    { "name": "updatedProject", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "new immutable project revision; previous artifacts untouched" }
+  ],
+  "parameters": [
+    { "name": "clipIndex", "type": "number", "minimum": 0, "description": "Flat index into the clips of all tracks in canonical order (video tracks bottom-up, then audio)." },
+    { "name": "start", "type": "duration", "unit": "seconds", "minimum": 0, "description": "New source-in point within the clip's source range; omit to keep the current in point." },
+    { "name": "end", "type": "duration", "unit": "seconds", "minimum": 0, "description": "New source-out point within the clip's source range; omit to cut to the end of available source." },
+    { "name": "mode", "type": "enum", "enumValues": ["reencode", "stream-copy"], "default": "reencode", "description": "reencode = frame-accurate; stream-copy = keyframe-aligned lossless (adapter support and semantics declared per mapping)." }
+  ],
+  "qualityDimensions": [
+    { "id": "frame-accuracy", "description": "Closeness of the realized cut boundaries to the requested ones.", "scale": "0-100" },
+    { "id": "stream-integrity", "description": "Decodability and A/V sync of the resulting stream (stream-copy snapping degrades this near non-keyframe boundaries).", "scale": "0-100" },
+    { "id": "determinism", "description": "Same inputs produce byte-identical project revisions.", "scale": "categorical" }
+  ],
+  "costModel": { "pricingUnit": "compute-minutes", "notes": "Local CLI execution. stream-copy is near-zero compute; reencode scales with duration and resolution." },
+  "latencyClass": "seconds",
+  "providerMappings": [
+    { "providerId": "mlt", "executionAdapter": "mlt-melt-cli", "maturity": "stable", "conformanceStatus": "unverified", "notes": "melt CLI; in/out points on playlist entries; frame-grid quantization. Live conformance skipped in Phase 1 sandbox (melt binary absent)." },
+    { "providerId": "ffmpeg", "executionAdapter": "ffmpeg-cli", "maturity": "stable", "conformanceStatus": "self-verified", "notes": "ffmpeg CLI; reencode cuts frame-accurate (input-side -ss), stream-copy cuts keyframe-aligned (declared). Live conformance scenario basic-cut run against ffmpeg 6/7 in the Phase 1 sandbox." },
+    { "providerId": "kdenlive", "executionAdapter": "kdenlive-melt-render", "maturity": "stable", "conformanceStatus": "unverified", "notes": "kdenlive project XML authored headlessly; rendered via melt. Live conformance skipped (kdenlive_render/melt absent)." },
+    { "providerId": "losslesscut", "executionAdapter": "losslesscut-project", "maturity": "planned", "conformanceStatus": "unverified", "notes": "Project JSON authoring only. Headless export is a documented coverage gap (gap.losslesscut-headless-cut, kind editor-coverage-gap); no GUI workaround per lock P5." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "basic-cut", "path": "packages/editor-adapters/src/domain/conformance/editor.cut-video/basic-cut.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Launch descriptor (draft per lock §7). Adapter mappings point at the six-editor launch set; the registry index is @gen/media-capabilities' (no second index, lock §8.1)."
+}

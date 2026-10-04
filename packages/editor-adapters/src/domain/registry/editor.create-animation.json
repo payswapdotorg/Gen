@@ -1,0 +1,35 @@
+{
+  "id": "editor.create-animation",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "editor",
+  "summary": "Create keyframed animation curves on a project or clip property (position, scale, rotation, opacity) with linear, bezier or constant interpolation, stored in the project revision and exported through the OTIO gen metadata channel.",
+  "inputs": [
+    { "name": "project", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "the timeline carrying the target clip" }
+  ],
+  "outputs": [
+    { "name": "updatedProject", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "new immutable project revision carrying the curve" }
+  ],
+  "parameters": [
+    { "name": "property", "type": "enum", "enumValues": ["position", "scale", "rotation", "opacity"], "description": "Animated property." },
+    { "name": "keyframes", "type": "string", "description": "Keyframes as t=v;t=v;... with t in seconds and v the property value." },
+    { "name": "interpolation", "type": "enum", "enumValues": ["linear", "bezier", "constant"], "default": "linear", "description": "Interpolation between keys." },
+    { "name": "target", "type": "string", "default": "clip-0", "description": "Target clip name, or the literal 'project' for project-level curves." }
+  ],
+  "qualityDimensions": [
+    { "id": "curve-fidelity", "description": "Round-trip preservation of key times, values and interpolation through native formats.", "scale": "0-100" },
+    { "id": "interpolation-coverage", "description": "Which interpolation modes the native format realizes natively vs approximates.", "scale": "categorical" }
+  ],
+  "costModel": { "pricingUnit": "free", "notes": "Pure project operation; cost realized at render time." },
+  "latencyClass": "subsecond",
+  "providerMappings": [
+    { "providerId": "blender", "executionAdapter": "blender-headless-python", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "Generated bpy script inserts fcurves/keyframes on VSE strips at the scene fps grid. Live conformance skipped in Phase 1 sandbox (blender binary absent); structural OTIO round-trip verified." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "basic-animation", "path": "packages/editor-adapters/src/domain/conformance/editor.create-animation/basic-animation.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Launch descriptor (draft per lock §7). Only Blender maps this capability in the launch set; other launch editors have no shared curve container in their declared headless subsets."
+}

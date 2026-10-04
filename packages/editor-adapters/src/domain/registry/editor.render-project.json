@@ -1,0 +1,39 @@
+{
+  "id": "editor.render-project",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "editor",
+  "summary": "Render/encode/export a project revision to an output artifact (mp4, webm, mov or png-sequence) through the adapter's declared render surface. Render outputs are content-addressed artifacts with lineage: producedBy (this capability, adapter, execution id), derivedFrom (source media + project artifacts).",
+  "inputs": [
+    { "name": "project", "mediaType": "application/vnd.gen.editor-project", "cardinality": "one", "constraints": "the project revision to render" }
+  ],
+  "outputs": [
+    { "name": "renderedOutput", "mediaType": "video/mp4", "cardinality": "one", "constraints": "container per RenderProfile.format; registered with full lineage" }
+  ],
+  "parameters": [
+    { "name": "format", "type": "enum", "enumValues": ["mp4", "webm", "mov", "png-sequence"], "description": "Output container/format." },
+    { "name": "codec", "type": "string", "description": "Optional codec hint (e.g. 'stream-copy' on ffmpeg to reuse the cut mode)." },
+    { "name": "resolution", "type": "string", "description": "Optional WxH override." },
+    { "name": "fps", "type": "number", "minimum": 1, "description": "Optional frame rate override (frame-grid formats)." }
+  ],
+  "qualityDimensions": [
+    { "id": "encode-fidelity", "description": "Visual quality of the encode at the declared profile.", "scale": "0-100" },
+    { "id": "determinism", "description": "Byte-identical output for identical inputs and profile (per adapter).", "scale": "categorical" },
+    { "id": "startup-cost", "description": "Cold start of the render surface (binary spawn, project bootstrap).", "scale": "seconds" }
+  ],
+  "costModel": { "pricingUnit": "compute-minutes", "notes": "Local compute; scales with timeline duration × resolution × codec." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "mlt", "executionAdapter": "mlt-melt-cli", "maturity": "stable", "conformanceStatus": "unverified", "notes": "melt <project> -consumer avformat:<out> with vcodec/acodec profile args. Live conformance skipped in Phase 1 sandbox (melt absent)." },
+    { "providerId": "blender", "executionAdapter": "blender-headless-python", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "blender --background --python <generated script> with scene.render FFMPEG settings; mp4/png-sequence. Live conformance skipped (blender absent)." },
+    { "providerId": "ffmpeg", "executionAdapter": "ffmpeg-cli", "maturity": "stable", "conformanceStatus": "self-verified", "notes": "Direct encode args or compiled filter_complex; live conformance scenario basic-render run against ffmpeg in the Phase 1 sandbox (measured numbers in evaluations/mode-evaluation.ffmpeg.json)." },
+    { "providerId": "kdenlive", "executionAdapter": "kdenlive-melt-render", "maturity": "stable", "conformanceStatus": "unverified", "notes": "melt avformat consumer over the kdenlive project (kdenlive_render probed as alternative). Live conformance skipped (binaries absent)." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "basic-render", "path": "packages/editor-adapters/src/domain/conformance/editor.render-project/basic-render.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Launch descriptor (draft per lock §7). Render surface facts per editor are recorded in packages/editor-adapters/evaluations/ (mode evaluation deliverable)."
+}
