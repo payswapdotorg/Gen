@@ -1,7 +1,7 @@
 # Phase 0 — Foundation (TL only) — RECORD
 
 Status: **DELIVERED** (this file is the phase record — P6: decisions live in the repo)
-Lock: ARCHITECTURE_LOCK.md v1.0.0 · Base: `main @ 29628c9`
+Lock: ARCHITECTURE_LOCK.md v1.0.0 · Pre-phase base: `main @ 29628c9` · Phase 0 content commit: `2568308af34c9513b14cb62f0eff16668400a814`
 Operator directive: 2026-10-04, IM trace `1a10530222635c29`
 
 ## Delivered artifacts
@@ -54,6 +54,7 @@ node scripts/creative/validate-spec-examples.mjs             # OK (8 schemas, 8 
 ## Phase 1 entry condition — SATISFIED
 
 "No worker begins implementation before ARCHITECTURE_LOCK.md exists" — it
-does, at the SHA this commit lands on. Workers clone at this SHA (recorded
+does, at the Phase 0 content commit `2568308af34c9513b14cb62f0eff16668400a814` (this record's follow-up commit
+pins the worker base below). Workers clone at this SHA (recorded
 in their packets) and push delivery branches; the TL re-runs every gate at
 the pushed SHA before merge (lock §10 — never trust reported numbers).
