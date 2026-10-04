@@ -1,0 +1,38 @@
+{
+  "planId": "plan.replace-actor-0001",
+  "goal": "Replace this actor with my character across the documentary interview sequence.",
+  "currentStep": "Director body (n2) is routing video.character-replacement for segment 1/4 via the capability router.",
+  "completed": [
+    {
+      "item": "Input artifacts ingested and content-addressed (source video 1280x720@25fps, 2 reference images).",
+      "evidence": ["runs/run-0009/ingest.json", "artifacts/art.src-video.json"]
+    },
+    {
+      "item": "Routing policy resolved: cheapest-reliable within identity-preservation >= 80.",
+      "evidence": ["runs/run-0009/router-trace-01.json"]
+    }
+  ],
+  "next": [
+    { "action": "Execute video.character-replacement on segment 1/4 (higgsfield/genjutsu selected).", "ownerNode": "n3", "eta": "minutes-class" },
+    { "action": "Continuity review of segment 1 output.", "ownerNode": "n4" }
+  ],
+  "blocked": [
+    {
+      "reason": "Segment 3 has no usable frontal reference frame — reference handling below threshold on both candidate mappings.",
+      "kind": "capability",
+      "capabilityGapRef": "gaps/gap.ref-frame-segment-3.json"
+    }
+  ],
+  "alternative": [
+    {
+      "path": "Premium-first: force higgsfield/genjutsu on all segments (higher identity score, ~3.1x cost).",
+      "tradeoffs": "+8 identity-preservation expected, cost $18 vs $5.80, same latency class."
+    },
+    {
+      "path": "Open-models-only: wan-2.2/animate on all segments.",
+      "tradeoffs": "-12 identity-preservation expected, cost $1.20, latency hours-class."
+    }
+  ],
+  "updatedAt": "2026-10-04T03:52:11Z",
+  "runRecordRef": "runs/run-0009.json"
+}

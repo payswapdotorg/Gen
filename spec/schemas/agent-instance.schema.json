@@ -1,0 +1,68 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/agent-instance.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentInstanceDescriptor",
+  "description": "Gen Creative Intelligence OS — agent instance binding (lock P2): Agent Instance = Agent Body Version + Cognitive Model + Possession Configuration + Environment + Runtime State (runtime state persisted out-of-band, in run records).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["instanceId", "bodyId", "bodyVersion", "cognitiveModel", "possessionConfig", "environment"],
+  "properties": {
+    "instanceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "Run-scoped unique instance id." },
+    "bodyId": { "type": "string", "pattern": "^body\\.[a-z0-9]+(-[a-z0-9]+)*$" },
+    "bodyVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "cognitiveModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "modelId"],
+      "properties": {
+        "providerId": { "type": "string", "minLength": 1, "description": "MUST resolve in the provider registry (P1)." },
+        "modelId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "possessionConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grants"],
+      "properties": {
+        "grants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["class"],
+            "properties": {
+              "class": { "type": "string", "description": "Must be within the body's possessionClasses (validated at binding)." },
+              "items": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "currency": { "type": "string" },
+            "maxSpend": { "type": "number", "minimum": 0 },
+            "computeMinutes": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspaceRef": { "type": "string", "description": "Working workspace reference." },
+        "artifactStoreRef": { "type": "string" },
+        "sandboxRef": { "type": "string" }
+      }
+    },
+    "runtimeStatePointer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runRecordRef": { "type": "string", "description": "Runtime state lives in the organization run store — NEVER in this persisted descriptor." },
+        "phase": { "enum": ["idle", "thinking", "acting", "waiting-human", "done", "failed"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/creative-provider.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CreativeProviderDescriptor",
+  "description": "Gen Creative Intelligence OS — creative provider / execution adapter descriptor (lock P1). Extends the @zcode/provider plane; never a second abstraction.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["providerId", "kind", "access", "executionAdapter", "capabilities", "facts"],
+  "properties": {
+    "providerId": { "type": "string", "minLength": 1, "description": "MUST be a provider-plane id (P1). e.g. higgsfield, wan-2.2, vace, ltx, hunyuan." },
+    "kind": { "enum": ["api", "open-model", "software-tool", "custom"] },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["api-key", "account", "oauth", "none"] },
+        "envVars": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }, "description": "Env var NAMES only — never values (lock P8)." },
+        "apiKeyManagementUrl": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "executionAdapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "transport"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "transport": { "enum": ["http", "cli", "embedded", "mcp", "remote-service"] },
+        "runtimeRequirements": { "type": "string", "description": "Runtime needs (GPU class, binaries, versions)." }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capabilityId", "maturity", "conformanceStatus"],
+        "properties": {
+          "capabilityId": { "type": "string", "pattern": "^(video|image|audio|editor|orchestration)\\.[a-z0-9-]+" },
+          "maturity": { "enum": ["reference", "stable", "experimental", "planned"] },
+          "conformanceStatus": { "enum": ["unverified", "self-verified", "certified", "below-threshold"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rateLimits", "pricing"],
+      "properties": {
+        "rateLimits": { "type": "string", "description": "Rate limit facts as router inputs." },
+        "pricing": { "type": "string", "description": "Pricing units per cost model classes." },
+        "latencyFacts": { "type": "string" },
+        "healthCheck": { "type": "string" },
+        "regions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "generationLifecycle": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "enum": ["submit", "poll", "stream", "cancel", "retrieve"] },
+      "description": "Lifecycle ops this adapter implements (media-provider-contract §3)."
+    },
+    "errorTaxonomy": {
+      "type": "array",
+      "items": { "enum": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"] }
+    },
+    "notes": { "type": "string" }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/task-plan.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskPlan",
+  "description": "Gen Creative Intelligence OS — Zcode-style task plan (lock P4): the user never sees a black-box generation process. spec/task-plan.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["planId", "goal", "currentStep", "completed", "next", "blocked", "alternative", "updatedAt"],
+  "properties": {
+    "planId": { "type": "string", "pattern": "^plan\\.[a-z0-9-]+$" },
+    "goal": { "type": "string", "minLength": 5, "description": "What the user wants — their words, normalized." },
+    "currentStep": { "type": "string", "minLength": 3, "description": "What the AI organization is doing right now, with the owning node named." },
+    "completed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "evidence"],
+        "properties": {
+          "item": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "description": "Artifact refs, run-record refs, gate results. Claims without evidence are lock violations." }
+          }
+        }
+      }
+    },
+    "next": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action"],
+        "properties": {
+          "action": { "type": "string" },
+          "ownerNode": { "type": "string" },
+          "eta": { "type": "string" }
+        }
+      }
+    },
+    "blocked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["reason", "kind"],
+        "properties": {
+          "reason": { "type": "string" },
+          "kind": { "enum": ["capability", "provider", "input", "human-approval"] },
+          "capabilityGapRef": { "type": "string", "description": "REQUIRED when kind=capability (P5 tie-in): references a schema-valid gap report." },
+          "missingInput": { "type": "string" }
+        }
+      }
+    },
+    "alternative": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "tradeoffs"],
+        "properties": {
+          "path": { "type": "string", "description": "An available routing/organization path, e.g. cheapest-reliable (open models + local tools) vs premium-first." },
+          "tradeoffs": { "type": "string", "description": "Cost/latency/quality deltas shown before switching." }
+        }
+      }
+    },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "runRecordRef": { "type": "string" }
+  }
+}

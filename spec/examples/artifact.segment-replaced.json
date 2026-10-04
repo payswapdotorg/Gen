@@ -1,0 +1,28 @@
+{
+  "artifactId": "art.seg1.replaced.v1",
+  "contentAddress": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "mediaType": "video/mp4",
+  "producedBy": {
+    "capabilityId": "video.character-replacement",
+    "providerId": "higgsfield",
+    "modelId": "genjutsu",
+    "executionAdapter": "higgsfield-http",
+    "executionId": "job-20261004-0001-a3f",
+    "agentInstanceId": "run-0009-n3"
+  },
+  "derivedFrom": ["art.src-segment-1", "art.reference-character-a"],
+  "timelineRef": {
+    "otioPath": "tracks/v1/character-replacement/clip-001",
+    "timelineArtifactId": "art.timeline.run-0009"
+  },
+  "metadata": {
+    "durationSeconds": 24.0,
+    "resolution": "1280x720",
+    "fps": 25,
+    "qualityScores": { "identity-preservation": 91, "temporal-coherence": 88, "motion-fidelity": 93 }
+  },
+  "storage": {
+    "storeRef": "runs/run-0009/artifacts/seg1-replaced-v1.mp4",
+    "sizeBytes": 18432000
+  }
+}

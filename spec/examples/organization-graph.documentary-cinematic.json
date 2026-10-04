@@ -1,0 +1,51 @@
+{
+  "id": "org.documentary-cinematic-v1",
+  "goal": "Make this documentary cinematic: color, pacing, audio and review organization for the remaster goal.",
+  "goalClass": "documentary-cinematic-remaster",
+  "nodes": [
+    {
+      "nodeId": "n1",
+      "kind": "human",
+      "human": { "role": "operator", "approvalGates": ["final-delivery", "budget-exceeds-envelope"] }
+    },
+    {
+      "nodeId": "n2",
+      "kind": "agent-instance",
+      "agentInstance": { "bodyId": "body.director", "bodyVersion": "1.0.0", "instanceId": "run-0008-n2", "cognitiveModel": { "providerId": "zai", "modelId": "glm-5.3" } }
+    },
+    {
+      "nodeId": "n3",
+      "kind": "agent-instance",
+      "agentInstance": { "bodyId": "body.video-continuity-supervisor", "bodyVersion": "1.0.0", "instanceId": "run-0008-n3", "cognitiveModel": { "providerId": "zai", "modelId": "glm-5.3" } }
+    },
+    {
+      "nodeId": "n4",
+      "kind": "capability-invocation",
+      "capabilityInvocation": { "capabilityId": "editor.render-project", "providerPolicy": "cheapest-reliable" }
+    }
+  ],
+  "edges": [
+    { "from": "n1", "to": "n2", "kind": "delegation", "notes": "Operator hands the goal to the director." },
+    { "from": "n2", "to": "n3", "kind": "review", "notes": "Continuity supervisor reviews generated segments." },
+    { "from": "n3", "to": "n4", "kind": "artifact-flow", "notes": "Approved segments flow into the render." },
+    { "from": "n2", "to": "n1", "kind": "approval", "notes": "Final delivery approval gate." }
+  ],
+  "allocations": {
+    "modelAllocation": { "n2": { "providerId": "zai", "modelId": "glm-5.3" }, "n3": { "providerId": "zai", "modelId": "glm-5.3" } },
+    "toolAllocation": { "n3": ["video.restyle", "video.reference-handling"] },
+    "budgetAllocation": { "n2": { "maxSpend": 2.0 }, "n3": { "maxSpend": 4.0 }, "stage-s1": { "maxSpend": 6.0 } },
+    "executionOrder": [
+      { "stageId": "stage-s0", "nodeIds": ["n2"], "dependsOn": [], "checkpoint": true },
+      { "stageId": "stage-s1", "nodeIds": ["n3"], "dependsOn": ["stage-s0"], "checkpoint": false },
+      { "stageId": "stage-s2", "nodeIds": ["n4"], "dependsOn": ["stage-s1"], "checkpoint": true }
+    ]
+  },
+  "simulation": { "seed": "doc-cine-2026-10-04-a", "scenarioRefs": ["agent-lab/scenarios/documentary-cinematic.json"] },
+  "evaluation": {
+    "certified": false,
+    "fitness": null,
+    "weights": { "goal": 0.4, "quality": 0.3, "cost": 0.1, "latency": 0.1, "human": 0.05, "failure": 0.05 },
+    "metrics": {},
+    "certificationEvidence": { "scenarioSetRef": "agent-lab/scenarios/documentary-cinematic.json", "replayRef": "agent-lab/evaluations/org.documentary-cinematic-v1.json" }
+  }
+}

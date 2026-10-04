@@ -1,0 +1,56 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/artifact.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ArtifactDescriptor",
+  "description": "Gen Creative Intelligence OS — project artifact graph node: content-addressed artifact with lineage (lock P1 chain terminal, packages/timeline).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["artifactId", "contentAddress", "mediaType", "producedBy"],
+  "properties": {
+    "artifactId": { "type": "string", "pattern": "^art\\.[a-z0-9-]+$" },
+    "contentAddress": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Content-addressed identity (sha256 of bytes). Binary assets never inline — store refs only."
+    },
+    "mediaType": {
+      "type": "string",
+      "description": "MIME type or interchange/project type: video/mp4, image/png, audio/wav, application/otio, application/vnd.gen.editor-project, application/vnd.gen.timeline-bundle+json …"
+    },
+    "producedBy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilityId"],
+      "properties": {
+        "capabilityId": { "type": "string", "description": "The capability whose execution produced this artifact (P3)." },
+        "providerId": { "type": "string" },
+        "modelId": { "type": "string" },
+        "executionAdapter": { "type": "string" },
+        "executionId": { "type": "string", "description": "Idempotent execution id (job handle)." },
+        "agentInstanceId": { "type": "string", "description": "Agent instance that requested the execution, if any." }
+      }
+    },
+    "derivedFrom": {
+      "type": "array",
+      "items": { "type": "string", "description": "Parent artifact ids — the lineage edges of the project artifact graph." }
+    },
+    "timelineRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "For timeline-articulate artifacts: the OTIO anchor.",
+      "properties": {
+        "otioPath": { "type": "string", "description": "Path within the OTIO timeline (track/index/range) or bundle-relative path." },
+        "timelineArtifactId": { "type": "string", "description": "The timeline bundle artifact this belongs to." }
+      }
+    },
+    "metadata": { "type": "object", "description": "Free-form typed metadata (duration, resolution, fps, codecs, quality scores…)." },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "storeRef": { "type": "string", "description": "Content store reference (local dir, R2 bucket URL class…) — never a secret." },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

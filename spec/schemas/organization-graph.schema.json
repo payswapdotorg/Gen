@@ -1,0 +1,134 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/organization-graph.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OrganizationGraph",
+  "description": "Gen Creative Intelligence OS — organization graph produced/searched/certified by the Agent Organization Lab (spec/organization-lab.md).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "goal", "goalClass", "nodes", "edges", "allocations"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^org\\.[a-z0-9]+(-[a-z0-9]+)*$" },
+    "goal": { "type": "string", "minLength": 5 },
+    "goalClass": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nodeId", "kind"],
+        "properties": {
+          "nodeId": { "type": "string", "pattern": "^n[0-9]+[a-z0-9-]*$" },
+          "kind": { "enum": ["agent-instance", "human", "capability-invocation"] },
+          "agentInstance": {
+            "type": "object",
+            "description": "Present iff kind=agent-instance: the agent-instance binding (schema agent-instance.schema.json, inline).",
+            "required": ["bodyId", "cognitiveModel"],
+            "properties": {
+              "bodyId": { "type": "string", "pattern": "^body\\.[a-z0-9]+(-[a-z0-9]+)*$" },
+              "bodyVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+              "instanceId": { "type": "string" },
+              "cognitiveModel": {
+                "type": "object",
+                "required": ["providerId", "modelId"],
+                "properties": {
+                  "providerId": { "type": "string" },
+                  "modelId": { "type": "string" }
+                }
+              }
+            }
+          },
+          "human": {
+            "type": "object",
+            "description": "Present iff kind=human.",
+            "required": ["role"],
+            "properties": {
+              "role": { "type": "string" },
+              "decisionInterface": { "type": "string", "description": "Optional body-shaped contract the human fulfills." },
+              "approvalGates": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "capabilityInvocation": {
+            "type": "object",
+            "description": "Present iff kind=capability-invocation.",
+            "required": ["capabilityId"],
+            "properties": {
+              "capabilityId": { "type": "string" },
+              "parameterBindings": { "type": "object" },
+              "providerPolicy": { "type": "string", "description": "Routing policy constraint, e.g. cheapest-reliable, premium-first." }
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "kind"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "kind": { "enum": ["delegation", "review", "artifact-flow", "approval"] },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "allocations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executionOrder"],
+      "properties": {
+        "modelAllocation": { "type": "object", "description": "nodeId → (providerId, modelId); the lab's model-assignment decision output." },
+        "toolAllocation": { "type": "object", "description": "nodeId → granted capabilities/tools." },
+        "budgetAllocation": { "type": "object", "description": "nodeId/stage → budget envelope." },
+        "executionOrder": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["stageId", "nodeIds"],
+            "properties": {
+              "stageId": { "type": "string" },
+              "nodeIds": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "dependsOn": { "type": "array", "items": { "type": "string" } },
+              "checkpoint": { "type": "boolean", "default": false }
+            }
+          }
+        }
+      }
+    },
+    "simulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "seed": { "type": "string" },
+        "scenarioRefs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["certified"],
+      "properties": {
+        "certified": { "type": "boolean" },
+        "fitness": { "type": "number" },
+        "weights": { "type": "object", "description": "goal/quality/cost/latency/human/failure weights used." },
+        "metrics": { "type": "object" },
+        "certificationEvidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scenarioSetRef", "replayRef"],
+          "properties": {
+            "scenarioSetRef": { "type": "string", "description": "Pinned scenario set the evaluation replayed against." },
+            "replayRef": { "type": "string", "description": "Committed evaluation record path — numbers must be reproducible from seed." },
+            "certifiedAt": { "type": "string", "format": "date-time" },
+            "gapReportsResolved": { "type": "boolean", "description": "Certification bar: zero unresolved gap reports (organization-lab §4)." }
+          }
+        }
+      }
+    }
+  }
+}

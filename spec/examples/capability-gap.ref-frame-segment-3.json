@@ -1,0 +1,31 @@
+{
+  "gapId": "gap.ref-frame-segment-3",
+  "detectedAt": "2026-10-04T03:49:58Z",
+  "requestedCapability": {
+    "intent": "Character replacement on segment 3 with identity-preservation >= 80 given only profile-view reference frames.",
+    "capabilityId": "video.character-replacement",
+    "parameters": { "identityStrength": 0.85 }
+  },
+  "kind": "mapping-shortfall",
+  "failureEvidence": {
+    "summary": "Router trace: all 3 mappings rejected under the cheapest-reliable policy for this input class.",
+    "routerDecisionTrace": "runs/run-0009/router-trace-03.json",
+    "comparisonTableRef": "media-capabilities/evaluations/video.character-replacement.comparison.json",
+    "adapterErrorRecords": [],
+    "organizationRunRef": "runs/run-0009.json",
+    "artifactRefs": ["artifacts/art.src-segment-3.json"]
+  },
+  "impact": {
+    "goalClass": "character-replacement-edit",
+    "severity": "medium",
+    "frequency": "Observed on profile-view-only reference inputs."
+  },
+  "arena": {
+    "state": "detected",
+    "requestId": null,
+    "expertSessionRef": null,
+    "proposedCapabilityId": null,
+    "certificationEvidence": null,
+    "rationale": null
+  }
+}

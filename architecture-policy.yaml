@@ -55,6 +55,64 @@ modules:
   - id: zcode-cli
     roots: [apps/zcode-cli]
     managed: false
+  # ---- Gen Creative Intelligence OS (Phase 0, ARCHITECTURE_LOCK.md v1.0.0) ----
+  # New modules are managed from day one. Ownership: ARCHITECTURE_LOCK.md §5.
+  - id: media-capabilities
+    roots: [packages/media-capabilities/src]
+    managed: true
+    requires: [shared]
+    publicEntrypoints: [packages/media-capabilities/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters }
+    layerOrder: [domain, app, adapters]
+    owner: creative-capability
+  - id: media-providers
+    roots: [packages/media-providers/src]
+    managed: true
+    requires: [shared, media-capabilities]
+    publicEntrypoints: [packages/media-providers/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters }
+    layerOrder: [domain, app, adapters]
+    owner: creative-provider
+  - id: editor-adapters
+    roots: [packages/editor-adapters/src]
+    managed: true
+    requires: [shared, media-capabilities, timeline]
+    publicEntrypoints: [packages/editor-adapters/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters }
+    layerOrder: [domain, app, adapters]
+    owner: creative-editor
+  - id: agent-lab
+    roots: [packages/agent-lab/src]
+    managed: true
+    requires: [shared, media-capabilities]
+    publicEntrypoints: [packages/agent-lab/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters }
+    layerOrder: [domain, app, adapters]
+    owner: creative-lab
+  - id: arena-bridge
+    roots: [packages/arena-bridge/src]
+    managed: true
+    requires: [shared, media-capabilities]
+    publicEntrypoints: [packages/arena-bridge/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters }
+    layerOrder: [domain, app, adapters]
+    owner: creative-escalation
+  - id: timeline
+    roots: [packages/timeline/src]
+    managed: true
+    requires: [shared]
+    publicEntrypoints: [packages/timeline/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters }
+    layerOrder: [domain, app, adapters]
+    owner: creative-artifact
+  - id: creative-workspace
+    roots: [apps/creative-workspace/src]
+    managed: true
+    requires: [shared, media-capabilities, timeline, agent-lab, arena-bridge]
+    publicEntrypoints: [apps/creative-workspace/src/contract.ts]
+    layers: { domain: domain, app: app, adapters: adapters, ui: ui }
+    layerOrder: [domain, app, ui, adapters]
+    owner: creative-workspace
 
 global:
   maxFileLines: 400

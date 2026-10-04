@@ -1,0 +1,22 @@
+{
+  "instanceId": "run-0007-n3",
+  "bodyId": "body.video-continuity-supervisor",
+  "bodyVersion": "1.0.0",
+  "cognitiveModel": { "providerId": "zai", "modelId": "glm-5.3" },
+  "possessionConfig": {
+    "grants": [
+      { "class": "review-read", "items": ["artifact:read", "score:read"] },
+      { "class": "corrective-request", "items": ["video.restyle"] }
+    ],
+    "budget": { "currency": "USD", "maxSpend": 4.0, "computeMinutes": 30 }
+  },
+  "environment": {
+    "workspaceRef": "run-0007/workspace",
+    "artifactStoreRef": "run-0007/artifacts",
+    "sandboxRef": "run-0007"
+  },
+  "runtimeStatePointer": {
+    "runRecordRef": "runs/run-0007.json",
+    "phase": "thinking"
+  }
+}

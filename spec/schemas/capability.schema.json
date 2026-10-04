@@ -1,0 +1,115 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/capability.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityDescriptor",
+  "description": "Gen Creative Intelligence OS — canonical capability descriptor (lock P3). All functionality is a capability; nothing executes outside the registry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "version", "status", "domain", "summary", "inputs", "outputs", "qualityDimensions", "latencyClass", "providerMappings", "conformance"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(video|image|audio|editor|orchestration)\\.[a-z0-9]+(-[a-z0-9]+)*(\\.[a-z0-9]+(-[a-z0-9]+)*)*$",
+      "description": "Dotted capability id, e.g. video.character-replacement, editor.render-project. Immutable once active."
+    },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "description": "Semver of the descriptor itself." },
+    "status": { "enum": ["draft", "active", "deprecated"], "description": "active requires conformance scenario + >=1 provider mapping + TL review (lock §7)." },
+    "domain": { "enum": ["video", "image", "audio", "editor", "orchestration"] },
+    "summary": { "type": "string", "minLength": 10, "description": "User-comprehensible one-paragraph summary." },
+    "inputs": { "type": "array", "items": { "$ref": "#/$defs/artifactPort" }, "minItems": 0 },
+    "outputs": { "type": "array", "items": { "$ref": "#/$defs/artifactPort" }, "minItems": 1 },
+    "parameters": { "type": "array", "items": { "$ref": "#/$defs/paramSpec" } },
+    "qualityDimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "scale"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "description": { "type": "string" },
+          "scale": { "enum": ["0-100", "0-1", "categorical", "seconds", "ratio"] }
+        }
+      }
+    },
+    "costModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pricingUnit"],
+      "properties": {
+        "pricingUnit": { "enum": ["per-invocation", "per-second-of-output", "per-image", "per-megapixel", "compute-minutes", "free"] },
+        "currency": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "latencyClass": { "enum": ["subsecond", "seconds", "minutes", "hours", "interactive"] },
+    "providerMappings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/providerMapping" },
+      "description": "The provider plane binding (P1). Multiple mappings per capability are the norm — provider neutrality."
+    },
+    "conformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scenarios", "certification"],
+      "properties": {
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "path"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "path": { "type": "string", "description": "Repo-relative path to the scenario fixture." }
+            }
+          }
+        },
+        "certification": { "enum": ["none", "self", "certified"] }
+      }
+    },
+    "notes": { "type": "string" }
+  },
+  "$defs": {
+    "artifactPort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "mediaType", "cardinality"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
+        "mediaType": { "type": "string", "description": "MIME type or project/interchange type, e.g. video/mp4, application/otio, application/vnd.gen.editor-project" },
+        "cardinality": { "enum": ["one", "zero-or-one", "one-or-more", "zero-or-more"] },
+        "constraints": { "type": "string", "description": "Human-readable constraints (duration, resolution, channel count...)." }
+      }
+    },
+    "paramSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "description"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-zA-Z0-9]*$" },
+        "type": { "enum": ["string", "number", "boolean", "enum", "artifact-ref", "duration"] },
+        "description": { "type": "string" },
+        "enumValues": { "type": "array", "items": { "type": "string" } },
+        "minimum": { "type": "number" },
+        "maximum": { "type": "number" },
+        "default": {},
+        "unit": { "type": "string" }
+      }
+    },
+    "providerMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "executionAdapter", "maturity", "conformanceStatus"],
+      "properties": {
+        "providerId": { "type": "string", "minLength": 1, "description": "Provider-plane id (P1) — resolvable via the @zcode/provider concepts; no shadow registry." },
+        "modelId": { "type": "string", "description": "Model id within the provider, when the capability is model-scoped." },
+        "executionAdapter": { "type": "string", "minLength": 1, "description": "Execution adapter id implementing (provider, model, capability)." },
+        "maturity": { "enum": ["reference", "stable", "experimental", "planned"] },
+        "conformanceStatus": { "enum": ["unverified", "self-verified", "certified", "below-threshold"] },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

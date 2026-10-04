@@ -1,0 +1,19 @@
+{
+  "name": "@gen/media-capabilities",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Gen Creative Intelligence OS — canonical capability registry + router (lock P3). One registry, media + editor namespaces.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}

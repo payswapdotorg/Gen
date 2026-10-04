@@ -1,0 +1,31 @@
+{
+  "providerId": "higgsfield",
+  "kind": "api",
+  "access": {
+    "type": "api-key",
+    "envVars": ["HIGGSFIELD_API_KEY"],
+    "apiKeyManagementUrl": "https://higgsfield.ai/settings/api-keys",
+    "notes": "Operator provisions the key via env. Login credentials are operator material — the adapter never consumes the login pair."
+  },
+  "executionAdapter": {
+    "id": "higgsfield-http",
+    "transport": "http",
+    "runtimeRequirements": "Outbound HTTPS; no GPU."
+  },
+  "capabilities": [
+    { "capabilityId": "video.character-replacement", "maturity": "reference", "conformanceStatus": "certified" },
+    { "capabilityId": "video.motion-transfer", "maturity": "reference", "conformanceStatus": "certified" },
+    { "capabilityId": "video.object-replacement", "maturity": "reference", "conformanceStatus": "self-verified" },
+    { "capabilityId": "video.restyle", "maturity": "reference", "conformanceStatus": "self-verified" },
+    { "capabilityId": "video.reference-handling", "maturity": "reference", "conformanceStatus": "unverified" }
+  ],
+  "facts": {
+    "rateLimits": "Observed limits recorded by the adapter at runtime; see harness evaluations.",
+    "pricing": "Per-second-of-output premium tier; exact prices in pricing facts table.",
+    "latencyFacts": "Minutes-class jobs for typical clips.",
+    "healthCheck": "GET /health on the API base"
+  },
+  "generationLifecycle": ["submit", "poll", "stream", "cancel", "retrieve"],
+  "errorTaxonomy": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"],
+  "notes": "Reference provider: the compatibility baseline for the Genjutsu capability set (spec/media-provider-contract.md §4)."
+}

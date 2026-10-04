@@ -1,0 +1,60 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/capability-gap.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityGapReport",
+  "description": "Gen Creative Intelligence OS — capability gap report + Arena state machine (lock P5, spec/human-escalation-contract.md). Failure produces gap reports, never hallucination.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["gapId", "detectedAt", "requestedCapability", "kind", "failureEvidence", "arena"],
+  "properties": {
+    "gapId": { "type": "string", "pattern": "^gap\\.[a-z0-9-]+$" },
+    "detectedAt": { "type": "string", "format": "date-time" },
+    "requestedCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent"],
+      "properties": {
+        "intent": { "type": "string", "description": "The user/system intent that could not be fulfilled." },
+        "capabilityId": { "type": "string", "description": "The capability id if the gap is about a known capability; absent for a wholly missing capability." },
+        "parameters": { "type": "object" }
+      }
+    },
+    "kind": { "enum": ["missing-capability", "mapping-shortfall", "organizational-gap", "editor-coverage-gap"] },
+    "failureEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "routerDecisionTrace": { "type": "string", "description": "Router trace: policy, candidate mappings, rejection reasons." },
+        "comparisonTableRef": { "type": "string", "description": "For mapping-shortfall: the committed comparison record." },
+        "adapterErrorRecords": { "type": "array", "items": { "type": "string" } },
+        "organizationRunRef": { "type": "string" },
+        "artifactRefs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goalClass", "severity"],
+      "properties": {
+        "goalClass": { "type": "string" },
+        "severity": { "enum": ["low", "medium", "high", "critical"] },
+        "frequency": { "type": "string", "description": "How often this gap blocks goals (observed or estimated)." }
+      }
+    },
+    "arena": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": { "enum": ["detected", "reported", "arena-requested", "expert-session", "proposed", "certifying", "certified", "available", "rejected", "wont-fix"] },
+        "requestId": { "type": "string" },
+        "expertSessionRef": { "type": "string", "description": "Expert-session record path (decisions recorded)." },
+        "proposedCapabilityId": { "type": "string", "description": "The new/extended capability proposed by the expert session." },
+        "certificationEvidence": { "type": "string", "description": "Certification follows the standard capability gate (schema + conformance + mapping) — Arena-sourced capabilities are NOT exempt." },
+        "rationale": { "type": "string", "description": "Terminal-state rationale for rejected/wont-fix." }
+      }
+    }
+  }
+}

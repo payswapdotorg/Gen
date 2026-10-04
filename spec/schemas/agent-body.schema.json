@@ -1,0 +1,104 @@
+{
+  "$id": "https://payswap.org/gen/spec/schemas/agent-body.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentBodyDescriptor",
+  "description": "Gen Creative Intelligence OS — agent body descriptor (lock P2). A model inhabits a body; the body is the stable role contract and never names a concrete model id.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "version", "role", "summary", "decisionInterface", "percepts", "actuators", "possessionClasses", "modelRequirements", "contextSchema", "evaluationCriteria", "lifecycle"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^body\\.[a-z0-9]+(-[a-z0-9]+)*$", "description": "e.g. body.director, body.video-continuity-supervisor" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "role": { "type": "string", "minLength": 5 },
+    "summary": { "type": "string" },
+    "decisionInterface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inputSchema", "outputSchema"],
+      "properties": {
+        "inputSchema": { "type": "string", "description": "Ref (path or $id) to the percept-bundle schema the occupant receives." },
+        "outputSchema": { "type": "string", "description": "Ref to the decision-bundle schema the occupant must produce — the interchange that makes models swappable." },
+        "notes": { "type": "string" }
+      }
+    },
+    "percepts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "description"],
+        "properties": {
+          "kind": { "enum": ["artifact", "task-plan-state", "capability-result", "human-message", "org-event", "environment"] },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "actuators": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capabilityIds"],
+      "properties": {
+        "capabilityIds": { "type": "array", "items": { "type": "string", "pattern": "^(video|image|audio|editor|orchestration)\\.[a-z0-9.-]+" }, "description": "Capabilities the body may request; execution always goes through the capability router (P3)." },
+        "tools": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "possessionClasses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "description": { "type": "string" },
+          "grants": { "type": "array", "items": { "type": "string" }, "description": "Capability/tool ids grantable in this class." },
+          "limits": { "type": "string", "description": "Budget/usage limits for this class." }
+        }
+      }
+    },
+    "modelRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["modalities", "qualityClass"],
+      "properties": {
+        "modalities": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "enum": ["text-in", "image-in", "video-in", "audio-in", "text-out", "image-out", "video-out", "audio-out"] }
+        },
+        "qualityClass": { "enum": ["lightweight", "standard", "flagship"] },
+        "minContextTokens": { "type": "integer", "minimum": 0 },
+        "latencyClass": { "enum": ["subsecond", "seconds", "minutes", "hours", "interactive"] },
+        "notes": { "type": "string", "description": "REQUIREMENT CLASSES ONLY — naming a concrete model id here is a lock violation (§8.2)." }
+      }
+    },
+    "contextSchema": { "type": "string", "description": "Ref to the body's working-memory contract schema." },
+    "evaluationCriteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "description": { "type": "string" },
+          "measurement": { "type": "string", "description": "How the organization lab measures this criterion." }
+        }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": { "enum": ["created", "active", "deprecated"] },
+        "created": { "type": "string", "format": "date" },
+        "deprecated": { "type": "string", "format": "date", "description": "Set when superseded; breaking decision-interface change = new version + deprecation path." },
+        "supersededBy": { "type": "string" }
+      }
+    }
+  }
+}

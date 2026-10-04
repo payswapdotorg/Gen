@@ -1,0 +1,19 @@
+{
+  "name": "@gen/agent-lab",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "description": "Gen Creative Intelligence OS — agent-lab (see spec/ and ARCHITECTURE_LOCK.md).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}

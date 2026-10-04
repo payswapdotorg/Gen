@@ -1,0 +1,38 @@
+{
+  "id": "video.character-replacement",
+  "version": "1.0.0",
+  "status": "active",
+  "domain": "video",
+  "summary": "Replace a character identity across a source video with a reference character, preserving motion, scene context and temporal coherence.",
+  "inputs": [
+    { "name": "sourceVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": ">= 480p, <= 4K, any fps" },
+    { "name": "referenceCharacter", "mediaType": "image/png", "cardinality": "one-or-more", "constraints": "frontal reference preferred" },
+    { "name": "sourceMask", "mediaType": "application/vnd.gen.mask+png", "cardinality": "zero-or-one", "constraints": "pre-masked subject regions" }
+  ],
+  "outputs": [
+    { "name": "resultVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": "matches source resolution/fps" }
+  ],
+  "parameters": [
+    { "name": "preserveAudio", "type": "boolean", "default": true, "description": "Carry the source audio track." },
+    { "name": "identityStrength", "type": "number", "minimum": 0, "maximum": 1, "default": 0.85, "description": "Identity transfer strength." }
+  ],
+  "qualityDimensions": [
+    { "id": "identity-preservation", "description": "Reference identity fidelity in the output.", "scale": "0-100" },
+    { "id": "temporal-coherence", "description": "Flicker/coherence across frames.", "scale": "0-100" },
+    { "id": "motion-fidelity", "description": "Source motion preserved.", "scale": "0-100" }
+  ],
+  "costModel": { "pricingUnit": "per-second-of-output", "currency": "USD", "notes": "Premium providers bill per output second; open models bill compute-minutes." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "higgsfield", "modelId": "genjutsu", "executionAdapter": "higgsfield-http", "maturity": "reference", "conformanceStatus": "certified" },
+    { "providerId": "wan-2.2", "modelId": "animate", "executionAdapter": "wan-open-exec", "maturity": "experimental", "conformanceStatus": "self-verified" },
+    { "providerId": "vace", "executionAdapter": "vace-open-exec", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "identity-basic", "path": "packages/media-capabilities/src/domain/conformance/video.character-replacement/identity-basic.json" }
+    ],
+    "certification": "self"
+  },
+  "notes": "Acceptance test T1 exercises this capability's routing (higgsfield vs wan/vace per policy)."
+}

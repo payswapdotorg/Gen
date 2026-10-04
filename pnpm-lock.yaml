@@ -91,6 +91,12 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
 
+  apps/creative-workspace:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
   apps/zcode-cli:
     dependencies:
       dotenv:
@@ -606,6 +612,18 @@ importers:
 
   apps/zcode-cli/tools/typescript: {}
 
+  packages/agent-lab:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
+  packages/arena-bridge:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
   packages/client:
     dependencies:
       '@zcode/rpc':
@@ -785,6 +803,12 @@ importers:
         specifier: ^8.0.2
         version: 8.0.8(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.9.0)
 
+  packages/editor-adapters:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
   packages/formal-proof:
     dependencies:
       d3:
@@ -800,6 +824,18 @@ importers:
       vite:
         specifier: ^8.0.2
         version: 8.0.8(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.9.0)
+
+  packages/media-capabilities:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
+  packages/media-providers:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
 
   packages/model-option-map:
     devDependencies:
@@ -1020,6 +1056,12 @@ importers:
       zod:
         specifier: 4.6.5
         version: 4.6.5
+    devDependencies:
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
+  packages/timeline:
     devDependencies:
       typescript:
         specifier: ^6.0.2
@@ -16172,11 +16214,11 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
+  lodash.pickby@4.6.0: {}
+
   lodash.uniqby@4.7.0: {}
 
   lodash@4.18.1: {}
-
-  lodash.pickby@4.6.0: {}
 
   log-symbols@4.1.0:
     dependencies:
