@@ -1,0 +1,299 @@
+{
+  "id": "org.documentary-cinematic-remaster-cand-04",
+  "goal": "Make this documentary cinematic: color, pacing, audio and review organization for the remaster goal.",
+  "goalClass": "documentary-cinematic-remaster",
+  "nodes": [
+    {
+      "nodeId": "n1",
+      "kind": "human",
+      "human": {
+        "role": "operator",
+        "approvalGates": [
+          "final-delivery",
+          "budget-exceeds-envelope"
+        ]
+      }
+    },
+    {
+      "nodeId": "n2",
+      "kind": "agent-instance",
+      "agentInstance": {
+        "bodyId": "body.director",
+        "bodyVersion": "1.0.0",
+        "instanceId": "cand-04-n2",
+        "cognitiveModel": {
+          "providerId": "zai",
+          "modelId": "glm-5.3"
+        }
+      }
+    },
+    {
+      "nodeId": "n3",
+      "kind": "agent-instance",
+      "agentInstance": {
+        "bodyId": "body.video-editor",
+        "bodyVersion": "1.0.0",
+        "instanceId": "cand-04-n3",
+        "cognitiveModel": {
+          "providerId": "open-models",
+          "modelId": "wan-vace-14b"
+        }
+      }
+    },
+    {
+      "nodeId": "n4",
+      "kind": "agent-instance",
+      "agentInstance": {
+        "bodyId": "body.color-specialist",
+        "bodyVersion": "1.0.0",
+        "instanceId": "cand-04-n4",
+        "cognitiveModel": {
+          "providerId": "open-models",
+          "modelId": "vace-frame-edit"
+        }
+      }
+    },
+    {
+      "nodeId": "n5",
+      "kind": "agent-instance",
+      "agentInstance": {
+        "bodyId": "body.audio-specialist",
+        "bodyVersion": "1.0.0",
+        "instanceId": "cand-04-n5",
+        "cognitiveModel": {
+          "providerId": "zai",
+          "modelId": "glm-5.3-voice"
+        }
+      }
+    },
+    {
+      "nodeId": "n6",
+      "kind": "agent-instance",
+      "agentInstance": {
+        "bodyId": "body.critic",
+        "bodyVersion": "1.0.0",
+        "instanceId": "cand-04-n6",
+        "cognitiveModel": {
+          "providerId": "zai",
+          "modelId": "glm-5.3-voice"
+        }
+      }
+    },
+    {
+      "nodeId": "n7",
+      "kind": "capability-invocation",
+      "capabilityInvocation": {
+        "capabilityId": "editor.render-project",
+        "parameterBindings": {
+          "profile": "cinematic"
+        },
+        "providerPolicy": "cheapest-reliable"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "n1",
+      "to": "n2",
+      "kind": "delegation",
+      "notes": "Operator hands the goal to the director."
+    },
+    {
+      "from": "n2",
+      "to": "n1",
+      "kind": "approval",
+      "notes": "Final delivery approval gate."
+    },
+    {
+      "from": "n2",
+      "to": "n3",
+      "kind": "delegation"
+    },
+    {
+      "from": "n2",
+      "to": "n4",
+      "kind": "delegation"
+    },
+    {
+      "from": "n2",
+      "to": "n5",
+      "kind": "delegation"
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "kind": "artifact-flow"
+    },
+    {
+      "from": "n4",
+      "to": "n5",
+      "kind": "artifact-flow"
+    },
+    {
+      "from": "n5",
+      "to": "n7",
+      "kind": "artifact-flow"
+    },
+    {
+      "from": "n6",
+      "to": "n3",
+      "kind": "review"
+    },
+    {
+      "from": "n6",
+      "to": "n4",
+      "kind": "review"
+    },
+    {
+      "from": "n6",
+      "to": "n5",
+      "kind": "review"
+    }
+  ],
+  "allocations": {
+    "modelAllocation": {
+      "n2": {
+        "providerId": "zai",
+        "modelId": "glm-5.3"
+      },
+      "n3": {
+        "providerId": "open-models",
+        "modelId": "wan-vace-14b"
+      },
+      "n4": {
+        "providerId": "open-models",
+        "modelId": "vace-frame-edit"
+      },
+      "n5": {
+        "providerId": "zai",
+        "modelId": "glm-5.3-voice"
+      },
+      "n6": {
+        "providerId": "zai",
+        "modelId": "glm-5.3-voice"
+      }
+    },
+    "toolAllocation": {
+      "n2": [
+        "orchestration.plan-workflow",
+        "orchestration.allocate-budget"
+      ],
+      "n3": [
+        "editor.cut-video",
+        "editor.composite-layer"
+      ],
+      "n4": [
+        "video.restyle",
+        "image.restyle",
+        "video.reference-handling"
+      ],
+      "n5": [
+        "audio.dialogue-cleanup",
+        "audio.ambient-mix"
+      ],
+      "n6": [
+        "artifact:read",
+        "score:read"
+      ]
+    },
+    "budgetAllocation": {
+      "n2": {
+        "maxSpend": 5.33
+      },
+      "n3": {
+        "maxSpend": 8
+      },
+      "n4": {
+        "maxSpend": 4
+      },
+      "n5": {
+        "maxSpend": 4
+      },
+      "n6": {
+        "maxSpend": 2.67
+      },
+      "stage-plan": {
+        "maxSpend": 5.33
+      },
+      "stage-edit": {
+        "maxSpend": 8
+      },
+      "stage-specialists": {
+        "maxSpend": 8
+      },
+      "stage-review": {
+        "maxSpend": 2.67
+      }
+    },
+    "executionOrder": [
+      {
+        "stageId": "stage-plan",
+        "nodeIds": [
+          "n2"
+        ],
+        "dependsOn": [],
+        "checkpoint": true
+      },
+      {
+        "stageId": "stage-edit",
+        "nodeIds": [
+          "n3"
+        ],
+        "dependsOn": [
+          "stage-plan"
+        ]
+      },
+      {
+        "stageId": "stage-specialists",
+        "nodeIds": [
+          "n4",
+          "n5"
+        ],
+        "dependsOn": [
+          "stage-edit"
+        ]
+      },
+      {
+        "stageId": "stage-review",
+        "nodeIds": [
+          "n6"
+        ],
+        "dependsOn": [
+          "stage-specialists"
+        ]
+      },
+      {
+        "stageId": "stage-deliver",
+        "nodeIds": [
+          "n7"
+        ],
+        "dependsOn": [
+          "stage-review"
+        ],
+        "checkpoint": true
+      }
+    ]
+  },
+  "simulation": {
+    "seed": "documentary-cinematic-remaster-cheapest-reliable-4"
+  },
+  "evaluation": {
+    "certified": true,
+    "fitness": 0.8398,
+    "weights": {
+      "goal": 0.4,
+      "quality": 0.3,
+      "cost": 0.1,
+      "latency": 0.1,
+      "human": 0.05,
+      "failure": 0.05
+    },
+    "metrics": {},
+    "certificationEvidence": {
+      "scenarioSetRef": "packages/agent-lab/src/domain/scenarios",
+      "replayRef": "packages/agent-lab/src/domain/evaluations/eval.org.documentary-cinematic-remaster-cand-04.json",
+      "certifiedAt": "2026-10-04T08:00:00.000Z",
+      "gapReportsResolved": true
+    }
+  }
+}

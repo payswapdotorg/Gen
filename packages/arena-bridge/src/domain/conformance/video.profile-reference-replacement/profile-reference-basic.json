@@ -1,0 +1,20 @@
+{
+  "scenarioId": "profile-reference-basic",
+  "description": "Conformance scenario fixture for video.profile-reference-replacement: character replacement on an interview segment with ONLY profile-view reference frames, under the cheapest-reliable routing policy.",
+  "provenance": "Phase-1 Arena-bridge fixture — execution belongs to the @gen/media-capabilities conformance harness (Worker 1); this file pins the scenario contract and quality thresholds.",
+  "inputs": {
+    "sourceVideo": "artifacts/art.src-sequence.json",
+    "referenceCharacter": ["artifacts/art.character-ref.json"],
+    "referenceClass": "profile-view-only"
+  },
+  "policy": "cheapest-reliable",
+  "expectedOutputs": {
+    "resultVideo": "matches source resolution/fps, identity preserved"
+  },
+  "qualityThresholds": {
+    "identity-preservation": { "scale": "0-100", "minimum": 80 },
+    "temporal-coherence": { "scale": "0-100", "minimum": 75 },
+    "reference-class-robustness": { "scale": "0-100", "minimum": 70 }
+  },
+  "rejectWhen": "identity-preservation on profile-view-only references falls below 80 — the exact shortfall observed in gap.forced-failure-video-character-replacement."
+}

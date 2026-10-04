@@ -1,0 +1,38 @@
+{
+  "recordId": "eval.org.documentary-cinematic-remaster-cand-04",
+  "organizationId": "org.documentary-cinematic-remaster-cand-04",
+  "scenarioSetRef": "packages/agent-lab/src/domain/scenarios",
+  "seed": "documentary-cinematic-remaster-cheapest-reliable-4",
+  "weights": {
+    "goal": 0.4,
+    "quality": 0.3,
+    "cost": 0.1,
+    "latency": 0.1,
+    "human": 0.05,
+    "failure": 0.05
+  },
+  "scenarios": [
+    {
+      "scenarioId": "documentary-cinematic",
+      "metrics": {
+        "fitness": 0.8398,
+        "goalAchievement": 1,
+        "qualityScore": 0.8663,
+        "costEfficiency": 0.755,
+        "latencyScore": 0.7947,
+        "humanScore": 0.5,
+        "gapPenalty": 0,
+        "totalSpendUsd": 5.88,
+        "virtualClockMs": 155000,
+        "approvalCount": 1,
+        "unresolvedGaps": 0,
+        "criteriaMet": 6,
+        "criteriaTotal": 6
+      },
+      "replayHash": "3474f812"
+    }
+  ],
+  "aggregateFitness": 0.8398,
+  "certified": true,
+  "generatedBy": "@gen/agent-lab lab-service evaluateAndCertify"
+}

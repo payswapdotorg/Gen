@@ -4,9 +4,8 @@
  * Mirrors spec/schemas/capability-gap.schema.json (P5: failure produces gap
  * reports, never hallucination) and the Arena state machine
  * (spec/human-escalation-contract.md).
- * Phase 0: core types; Worker 3 implements the gap store, arena request
- * builder, expert-session ingest and certification validator
- * (work/worker-3-mos-lab-arena.md).
+ * Implemented per work/worker-3-mos-lab-arena.md. Self-contained type mirror:
+ * no imports from ./domain (architecture check: forbidCycles).
  */
 
 export type CapabilityGapKind =
@@ -84,4 +83,42 @@ export interface CertificationRecord {
   readonly scenarioRefs: readonly string[];
   readonly evidenceRef: string;
   readonly certifiedAt: string;
+}
+
+/**
+ * Gap signal as emitted by the organization lab / router (P5). Structurally
+ * the capability-gap schema minus the arena block — the ingest input. Declared
+ * here (not imported from @gen/agent-lab) because arena-bridge does not
+ * require agent-lab in the architecture policy; the shape is the shared
+ * schema contract.
+ */
+export interface GapSignalInput {
+  readonly gapId: string;
+  readonly detectedAt: string;
+  readonly requestedCapability: {
+    intent: string;
+    capabilityId?: string;
+    parameters?: Record<string, unknown>;
+  };
+  readonly kind: CapabilityGapKind;
+  readonly failureEvidence: GapFailureEvidence;
+  readonly impact: GapImpact;
+}
+
+/** Append-oriented transition log entry (audit trail, P6). */
+export interface GapTransitionEntry {
+  readonly gapId: string;
+  readonly from: ArenaState;
+  readonly to: ArenaState;
+  readonly at: string;
+  readonly via: string;
+  readonly detail?: string;
+}
+
+/** Port: persistence for gap reports + the append-only transition log. */
+export interface GapStore {
+  readonly save: (report: CapabilityGapReport) => void;
+  readonly get: (gapId: string) => CapabilityGapReport | undefined;
+  readonly list: () => readonly CapabilityGapReport[];
+  readonly appendTransition: (entry: GapTransitionEntry) => void;
 }

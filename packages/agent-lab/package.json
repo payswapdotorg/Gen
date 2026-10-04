@@ -10,8 +10,13 @@
   },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "lint": "oxlint"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "lint": "oxlint",
+    "test": "node --import tsx --test \"test/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@gen/media-capabilities": "workspace:*",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "typescript": "^6.0.2"

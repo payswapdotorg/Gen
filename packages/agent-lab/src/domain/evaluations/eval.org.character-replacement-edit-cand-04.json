@@ -1,0 +1,38 @@
+{
+  "recordId": "eval.org.character-replacement-edit-cand-04",
+  "organizationId": "org.character-replacement-edit-cand-04",
+  "scenarioSetRef": "packages/agent-lab/src/domain/scenarios",
+  "seed": "character-replacement-edit-cheapest-reliable-4",
+  "weights": {
+    "goal": 0.4,
+    "quality": 0.3,
+    "cost": 0.1,
+    "latency": 0.1,
+    "human": 0.05,
+    "failure": 0.05
+  },
+  "scenarios": [
+    {
+      "scenarioId": "forced-failure",
+      "metrics": {
+        "fitness": 0.7966,
+        "goalAchievement": 0.8,
+        "qualityScore": 0.91,
+        "costEfficiency": 0.86,
+        "latencyScore": 0.9259,
+        "humanScore": 0.5,
+        "gapPenalty": 0,
+        "totalSpendUsd": 2.8,
+        "virtualClockMs": 48000,
+        "approvalCount": 1,
+        "unresolvedGaps": 0,
+        "criteriaMet": 4,
+        "criteriaTotal": 5
+      },
+      "replayHash": "1c96af5b"
+    }
+  ],
+  "aggregateFitness": 0.7966,
+  "certified": false,
+  "generatedBy": "@gen/agent-lab lab-service evaluateAndCertify"
+}

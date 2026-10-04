@@ -1,0 +1,7 @@
+{"gapId":"gap.forced-failure-video-character-replacement","from":"detected","to":"reported","at":"2026-10-04T08:30:00.000Z","via":"record"}
+{"gapId":"gap.forced-failure-video-character-replacement","from":"reported","to":"arena-requested","at":"2026-10-04T08:45:00.000Z","via":"requestArena"}
+{"gapId":"gap.forced-failure-video-character-replacement","from":"arena-requested","to":"expert-session","at":"2026-10-04T09:00:00.000Z","via":"ingestExpertSession","detail":"propose-capability"}
+{"gapId":"gap.forced-failure-video-character-replacement","from":"expert-session","to":"proposed","at":"2026-10-04T09:15:00.000Z","via":"propose"}
+{"gapId":"gap.forced-failure-video-character-replacement","from":"proposed","to":"certifying","at":"2026-10-04T09:30:00.000Z","via":"submitCertification"}
+{"gapId":"gap.forced-failure-video-character-replacement","from":"certifying","to":"certified","at":"2026-10-04T09:45:00.000Z","via":"certify"}
+{"gapId":"gap.forced-failure-video-character-replacement","from":"certified","to":"available","at":"2026-10-04T10:00:00.000Z","via":"publish"}

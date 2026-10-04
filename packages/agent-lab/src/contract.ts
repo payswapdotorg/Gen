@@ -2,10 +2,11 @@
  * @gen/agent-lab — public contract (lock §6).
  *
  * Mirrors spec/schemas/agent-body.schema.json,
- * spec/schemas/agent-instance.schema.json and
- * spec/schemas/organization-graph.schema.json (compile-time mirror).
- * Phase 0: core types; Worker 3 implements the body registry, organization
- * search, simulation and evaluation loop (work/worker-3-mos-lab-arena.md).
+ * spec/schemas/agent-instance.schema.json,
+ * spec/schemas/organization-graph.schema.json and
+ * spec/schemas/task-plan.schema.json (compile-time mirror; runtime zod
+ * bindings live in domain/schema — parity is tested).
+ * Implemented per work/worker-3-mos-lab-arena.md.
  */
 
 /** P2: a model inhabits a body — bodies never name concrete model ids. */
@@ -26,6 +27,7 @@ export interface ModelRequirements {
   readonly qualityClass: QualityClass;
   readonly minContextTokens?: number;
   readonly latencyClass?: "subsecond" | "seconds" | "minutes" | "hours" | "interactive";
+  readonly notes?: string;
 }
 
 export interface DecisionInterface {
@@ -76,6 +78,11 @@ export interface AgentInstanceDescriptor {
     readonly artifactStoreRef?: string;
     readonly sandboxRef?: string;
   };
+  /** Runtime state lives in the organization run store — NEVER in this descriptor. */
+  readonly runtimeStatePointer?: {
+    readonly runRecordRef?: string;
+    readonly phase?: "idle" | "thinking" | "acting" | "waiting-human" | "done" | "failed";
+  };
 }
 
 /** Organization graph (spec/organization-lab.md). */
@@ -108,6 +115,8 @@ export interface OrganizationGraph {
     budgetAllocation?: Record<string, { maxSpend?: number; computeMinutes?: number }>;
     executionOrder: readonly OrganizationStage[];
   };
+  readonly simulation?: { seed?: string; scenarioRefs?: readonly string[] };
+  readonly evaluation?: OrganizationEvaluation;
 }
 
 /** Fitness evaluation (organization-lab §4) — numbers reproducible from seed. */
@@ -132,3 +141,131 @@ export interface OrganizationSearchSpace {
   readonly executionOrdering: boolean;
   readonly budgetAllocation: boolean;
 }
+
+/** TaskPlan (P4) — same schema in simulation and runtime (spec/task-plan.md). */
+export interface TaskPlan {
+  readonly planId: string;
+  readonly goal: string;
+  readonly currentStep: string;
+  readonly completed: readonly { item: string; evidence: readonly string[] }[];
+  readonly next: readonly { action: string; ownerNode?: string; eta?: string }[];
+  readonly blocked: readonly {
+    reason: string;
+    kind: "capability" | "provider" | "input" | "human-approval";
+    capabilityGapRef?: string;
+    missingInput?: string;
+  }[];
+  readonly alternative: readonly { path: string; tradeoffs: string }[];
+  readonly updatedAt: string;
+  readonly runRecordRef?: string;
+}
+
+/** Capability-gap draft emitted by the lab (P5); recorded by @gen/arena-bridge. */
+export type GapSignalKind =
+  | "missing-capability"
+  | "mapping-shortfall"
+  | "organizational-gap"
+  | "editor-coverage-gap";
+
+export type GapSeverity = "low" | "medium" | "high" | "critical";
+
+export interface GapSignalDraft {
+  readonly gapId: string;
+  readonly detectedAt: string;
+  readonly requestedCapability: {
+    intent: string;
+    capabilityId?: string;
+    parameters?: Record<string, unknown>;
+  };
+  readonly kind: GapSignalKind;
+  readonly failureEvidence: {
+    summary: string;
+    routerDecisionTrace?: string;
+    comparisonTableRef?: string;
+    adapterErrorRecords?: readonly string[];
+    organizationRunRef?: string;
+    artifactRefs?: readonly string[];
+  };
+  readonly impact: { goalClass: string; severity: GapSeverity; frequency?: string };
+}
+
+/** Frozen catalog ports over the provider/capability planes (P1/P3 — the lab never re-implements them). */
+export interface ModelCatalogEntry {
+  readonly providerId: string;
+  readonly modelId: string;
+  readonly modalities: readonly string[];
+  readonly qualityClass: QualityClass;
+  readonly contextTokens?: number;
+  readonly latencyClass?: string;
+  readonly costPerDecisionUsd?: number;
+}
+
+export interface CapabilityCatalogEntry {
+  readonly capabilityId: string;
+  readonly domain: string;
+  readonly status: string;
+}
+
+export interface LabCatalogs {
+  readonly models: readonly ModelCatalogEntry[];
+  readonly capabilities: readonly CapabilityCatalogEntry[];
+}
+
+/** Deterministic simulation telemetry (per node, bounded). */
+export interface NodeTelemetry {
+  readonly node: string;
+  readonly bodyId?: string;
+  readonly decisions: number;
+  readonly capabilityInvocations: number;
+  readonly spendUsd: number;
+  readonly qualityScores: readonly number[];
+}
+
+export interface SimulationEvent {
+  readonly seq: number;
+  readonly atMs: number;
+  readonly type:
+    | "stage-started"
+    | "node-acted"
+    | "capability-invoked"
+    | "artifact-produced"
+    | "review-verdict"
+    | "approval-recorded"
+    | "plan-updated"
+    | "gap-signaled"
+    | "stage-completed"
+    | "run-finished";
+  readonly node?: string;
+  readonly stage?: string;
+  readonly detail: string;
+}
+
+export interface SimulationRunRecord {
+  readonly runId: string;
+  readonly organizationId: string;
+  readonly scenarioId: string;
+  readonly seed: string;
+  readonly virtualClockMs: number;
+  readonly events: readonly SimulationEvent[];
+  readonly telemetry: {
+    readonly byNode: Readonly<Record<string, NodeTelemetry>>;
+    readonly totalSpendUsd: number;
+    readonly approvalCount: number;
+  };
+  readonly artifacts: readonly string[];
+  readonly taskPlans: readonly TaskPlan[];
+  readonly gapSignals: readonly GapSignalDraft[];
+  readonly criteriaResults: readonly { id: string; description: string; met: boolean }[];
+  readonly replayHash: string;
+  readonly finished: boolean;
+  readonly failureReason?: string;
+}
+
+/**
+ * NOTE (layer rule): the lab service API types (search request/result, fitness
+ * weights, certification bar, evaluation records + store port) live in
+ * ./domain/lab-api.ts and are surfaced through src/index.ts — re-exporting
+ * them here would create a contract ↔ domain import cycle (architecture
+ * check: forbidCycles). contract.ts stays a self-contained schema mirror.
+ */
+
