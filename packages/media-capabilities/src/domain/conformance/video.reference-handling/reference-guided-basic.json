@@ -1,0 +1,16 @@
+{
+  "id": "reference-guided-basic",
+  "capabilityId": "video.reference-handling",
+  "description": "Baseline reference-guided shot: one character reference plus a scene reference produce a 5s 1080p walking shot consistent with both references.",
+  "inputs": {
+    "referenceImages": [
+      { "kind": "fixture-ref", "ref": "sample-sources/character-frontal-01", "mediaType": "image/png", "resolution": "1024x1024" },
+      { "kind": "fixture-ref", "ref": "sample-sources/street-scene-01", "mediaType": "image/png", "resolution": "1280x720" }
+    ]
+  },
+  "parameters": { "prompt": "the character walks down the street at golden hour", "durationSeconds": 5, "resolution": "1080p" },
+  "expectedOutputInvariants": {
+    "schema": { "outputPort": "resultVideo", "mediaType": "video/mp4", "cardinality": "one" },
+    "qualityThresholds": { "reference-fidelity": 65, "temporal-coherence": 60, "prompt-alignment": 65 }
+  }
+}

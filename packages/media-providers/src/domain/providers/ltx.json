@@ -1,0 +1,26 @@
+{
+  "providerId": "ltx",
+  "kind": "open-model",
+  "access": {
+    "type": "api-key",
+    "envVars": ["LTX_EXECUTION_ENDPOINT", "LTX_API_KEY"],
+    "notes": "Open execution service endpoint; optional bearer token. Env names only (P8)."
+  },
+  "executionAdapter": {
+    "id": "ltx-open-exec",
+    "transport": "remote-service",
+    "runtimeRequirements": "Open-execution service speaking the documented jobs protocol; LTX-Video class backend (fast distilled inference)."
+  },
+  "capabilities": [
+    { "capabilityId": "video.restyle", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "facts": {
+    "rateLimits": "Bounded by the open-execution deployment (self-hosted).",
+    "pricing": "compute-minutes; effectively infrastructure cost when self-hosted.",
+    "latencyFacts": "Seconds-to-minutes class; LTX-Video distilled inference is among the fastest open options.",
+    "healthCheck": "GET /health on the execution endpoint"
+  },
+  "generationLifecycle": ["submit", "poll", "stream", "retrieve"],
+  "errorTaxonomy": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"],
+  "notes": "Latency-first alternate for restyle-class work (T3 latency dimension)."
+}

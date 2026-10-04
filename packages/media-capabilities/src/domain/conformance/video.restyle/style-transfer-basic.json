@@ -1,0 +1,17 @@
+{
+  "id": "style-transfer-basic",
+  "capabilityId": "video.restyle",
+  "description": "Baseline restyle: a 6s street clip is restyled to a 1980s film-stock look from two style exemplars while composition and motion stay intact.",
+  "inputs": {
+    "sourceVideo": { "kind": "fixture-ref", "ref": "sample-sources/street-day-720p-6s", "mediaType": "video/mp4", "durationSeconds": 6, "resolution": "1280x720" },
+    "styleReferences": [
+      { "kind": "fixture-ref", "ref": "sample-sources/style-film80s-01", "mediaType": "image/png", "resolution": "1024x1024" },
+      { "kind": "fixture-ref", "ref": "sample-sources/style-film80s-02", "mediaType": "image/png", "resolution": "1024x1024" }
+    ]
+  },
+  "parameters": { "styleStrength": 0.8, "preserveStructure": true },
+  "expectedOutputInvariants": {
+    "schema": { "outputPort": "resultVideo", "mediaType": "video/mp4", "cardinality": "one" },
+    "qualityThresholds": { "style-fidelity": 65, "structure-preservation": 70, "temporal-coherence": 65 }
+  }
+}

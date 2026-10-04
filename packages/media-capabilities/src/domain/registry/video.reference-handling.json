@@ -1,0 +1,38 @@
+{
+  "id": "video.reference-handling",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "video",
+  "summary": "Generate or steer video output from reference images (identity, subject and scene anchors) plus an optional motion hint, keeping the referenced entities consistent across the result.",
+  "inputs": [
+    { "name": "referenceImages", "mediaType": "image/png", "cardinality": "one-or-more", "constraints": "entities/scenes to keep consistent" },
+    { "name": "motionHint", "mediaType": "video/mp4", "cardinality": "zero-or-one", "constraints": "optional motion/trajectory hint clip" }
+  ],
+  "outputs": [
+    { "name": "resultVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": ">= 720p, duration from parameters" }
+  ],
+  "parameters": [
+    { "name": "prompt", "type": "string", "description": "Natural-language description of the desired shot." },
+    { "name": "durationSeconds", "type": "duration", "default": 5, "unit": "s", "minimum": 1, "maximum": 60, "description": "Target output duration." },
+    { "name": "resolution", "type": "enum", "enumValues": ["720p", "1080p", "4k"], "default": "1080p", "description": "Output resolution class." }
+  ],
+  "qualityDimensions": [
+    { "id": "reference-fidelity", "description": "Referenced entities reproduced consistently.", "scale": "0-100" },
+    { "id": "temporal-coherence", "description": "Flicker/coherence across frames.", "scale": "0-100" },
+    { "id": "prompt-alignment", "description": "Output matches the textual intent.", "scale": "0-100" }
+  ],
+  "costModel": { "pricingUnit": "per-second-of-output", "currency": "USD", "notes": "Premium providers bill per output second; open models bill compute-minutes." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "higgsfield", "modelId": "genjutsu", "executionAdapter": "higgsfield-http", "maturity": "reference", "conformanceStatus": "unverified", "notes": "Genjutsu reference-conditioned generation." },
+    { "providerId": "wan-2.2", "modelId": "animate", "executionAdapter": "wan-open-exec", "maturity": "experimental", "conformanceStatus": "unverified" },
+    { "providerId": "hunyuan", "modelId": "hunyuan-video", "executionAdapter": "hunyuan-open-exec", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "reference-guided-basic", "path": "packages/media-capabilities/src/domain/conformance/video.reference-handling/reference-guided-basic.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Feeds the character/object consistency invariants other capabilities rely on (identity stays stable across shots)."
+}

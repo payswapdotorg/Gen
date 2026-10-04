@@ -4,16 +4,27 @@
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
-  "description": "Gen Creative Intelligence OS — media-providers (see spec/ and ARCHITECTURE_LOCK.md).",
+  "description": "Gen Creative Intelligence OS \u2014 media execution adapters (Higgsfield reference + open models), conformance + comparison harness (lock P1, spec/media-provider-contract.md).",
   "exports": {
     ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint"
+    "typecheck:tests": "tsc --noEmit -p tsconfig.test.json",
+    "lint": "oxlint",
+    "validate": "node --import tsx src/adapters/harness-cli.ts validate",
+    "harness": "node --import tsx src/adapters/harness-cli.ts harness",
+    "test": "pnpm run typecheck:tests && node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@gen/media-capabilities": "workspace:*",
+    "ajv": "^8.17.1",
+    "zod": "4.6.5"
   },
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.19.4",
     "typescript": "^6.0.2"
   }
 }

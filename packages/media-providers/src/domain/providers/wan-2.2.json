@@ -1,0 +1,28 @@
+{
+  "providerId": "wan-2.2",
+  "kind": "open-model",
+  "access": {
+    "type": "api-key",
+    "envVars": ["WAN_2_2_EXECUTION_ENDPOINT", "WAN_2_2_API_KEY"],
+    "notes": "Open execution service endpoint (local GPU gateway or hosted). Optional bearer token. Env names only (P8)."
+  },
+  "executionAdapter": {
+    "id": "wan-open-exec",
+    "transport": "remote-service",
+    "runtimeRequirements": "Open-execution service speaking the documented jobs protocol; Wan 2.2 class GPU backend (>= 24GB VRAM class for 720p)."
+  },
+  "capabilities": [
+    { "capabilityId": "video.character-replacement", "maturity": "experimental", "conformanceStatus": "self-verified", "notes": "Mock-mode conformance recorded; open execution transport." },
+    { "capabilityId": "video.motion-transfer", "maturity": "experimental", "conformanceStatus": "self-verified", "notes": "Animate model; mock-mode conformance recorded." },
+    { "capabilityId": "video.reference-handling", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "facts": {
+    "rateLimits": "Bounded by the open-execution deployment (self-hosted).",
+    "pricing": "compute-minutes; effectively infrastructure cost when self-hosted.",
+    "latencyFacts": "Minutes-class; depends on GPU class and queue depth.",
+    "healthCheck": "GET /health on the execution endpoint"
+  },
+  "generationLifecycle": ["submit", "poll", "stream", "cancel", "retrieve"],
+  "errorTaxonomy": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"],
+  "notes": "Provider-neutral alternate for T1/T3: same capability descriptors and conformance scenarios as the Higgsfield reference."
+}

@@ -1,0 +1,16 @@
+{
+  "id": "object-swap-basic",
+  "capabilityId": "video.object-replacement",
+  "description": "Baseline object swap: a branded bottle in a 4s tabletop shot is replaced by the reference product; lighting and occlusion must stay plausible.",
+  "inputs": {
+    "sourceVideo": { "kind": "fixture-ref", "ref": "sample-sources/tabletop-bottle-720p-4s", "mediaType": "video/mp4", "durationSeconds": 4, "resolution": "1280x720" },
+    "referenceObject": [
+      { "kind": "fixture-ref", "ref": "sample-sources/product-bottle-white", "mediaType": "image/png", "resolution": "1024x1024" }
+    ]
+  },
+  "parameters": { "preserveAudio": true, "blendStrength": 0.9 },
+  "expectedOutputInvariants": {
+    "schema": { "outputPort": "resultVideo", "mediaType": "video/mp4", "cardinality": "one" },
+    "qualityThresholds": { "object-fidelity": 70, "temporal-coherence": 65, "scene-consistency": 65 }
+  }
+}

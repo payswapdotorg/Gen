@@ -1,0 +1,25 @@
+{
+  "providerId": "hunyuan",
+  "kind": "open-model",
+  "access": {
+    "type": "api-key",
+    "envVars": ["HUNYUAN_EXECUTION_ENDPOINT", "HUNYUAN_API_KEY"],
+    "notes": "Open execution service endpoint; optional bearer token. Env names only (P8)."
+  },
+  "executionAdapter": {
+    "id": "hunyuan-open-exec",
+    "transport": "remote-service",
+    "runtimeRequirements": "Open-execution service speaking the documented jobs protocol; HunyuanVideo-class backend."
+  },
+  "capabilities": [
+    { "capabilityId": "video.reference-handling", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "facts": {
+    "rateLimits": "Bounded by the open-execution deployment (self-hosted).",
+    "pricing": "compute-minutes; effectively infrastructure cost when self-hosted.",
+    "latencyFacts": "Minutes-class; heavier inference than LTX-Video."
+  },
+  "generationLifecycle": ["submit", "poll", "cancel", "retrieve"],
+  "errorTaxonomy": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"],
+  "notes": "Reference-guided generation alternate for T1 provider neutrality."
+}

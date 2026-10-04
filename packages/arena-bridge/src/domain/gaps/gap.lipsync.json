@@ -1,0 +1,21 @@
+{
+  "gapId": "gap.lipsync",
+  "detectedAt": "2026-10-04T09:12:00Z",
+  "requestedCapability": {
+    "intent": "Drive a character's mouth and face motion from an audio track (lipsync) as part of character replacement and dialogue workflows — observed on the Higgsfield platform.",
+    "capabilityId": "video.lipsync"
+  },
+  "kind": "missing-capability",
+  "failureEvidence": {
+    "summary": "No audio-conditioned video capability descriptor exists in the registry; character-replacement workflows that need dialogue consistency cannot express it. Provider descriptor lists it as planned (higgsfield.json).",
+    "routerDecisionTrace": "capability=video.lipsync; rejection=capability-not-in-registry"
+  },
+  "impact": {
+    "goalClass": "character-dialogue-consistency",
+    "severity": "high",
+    "frequency": "Blocking for any intent involving speaking characters."
+  },
+  "arena": {
+    "state": "detected"
+  }
+}

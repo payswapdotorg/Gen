@@ -1,0 +1,50 @@
+{
+  "adapterId": "wan-open-exec",
+  "providerId": "wan-2.2",
+  "modelId": "animate",
+  "capabilityId": "video.character-replacement",
+  "scenarioId": "identity-basic",
+  "provenance": "simulated",
+  "lifecycle": {
+    "submit": {
+      "status": "queued",
+      "requestId": "sim-wan-identity-basic-0001"
+    },
+    "polls": [
+      {
+        "status": "queued"
+      },
+      {
+        "status": "running",
+        "progress": 0.25
+      },
+      {
+        "status": "running",
+        "progress": 0.7
+      },
+      {
+        "status": "succeeded"
+      }
+    ],
+    "artifacts": [
+      {
+        "ref": "artifacts/sim/wan-2.2/identity-basic/result.mp4",
+        "mediaType": "video/mp4"
+      }
+    ]
+  },
+  "observed": {
+    "qualityScores": {
+      "identity-preservation": 74,
+      "temporal-coherence": 70,
+      "motion-fidelity": 76
+    },
+    "latencyClass": "minutes",
+    "reliability": 0.82,
+    "cost": {
+      "estimate": 0.24,
+      "unit": "compute-minutes"
+    }
+  },
+  "notes": "Simulated expectation pending live calibration. Deliberately below the reference on identity-preservation \u2014 the honest open-model conformance class (T3 evidence). Cost estimate = normalized USD for this scenario invocation (premium: output-seconds \u00d7 rate; open models: compute cost)."
+}

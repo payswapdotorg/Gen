@@ -1,0 +1,45 @@
+{
+  "adapterId": "vace-open-exec",
+  "providerId": "vace",
+  "capabilityId": "video.character-replacement",
+  "scenarioId": "identity-basic",
+  "provenance": "simulated",
+  "lifecycle": {
+    "submit": {
+      "status": "queued",
+      "requestId": "sim-vace-identity-basic-0001"
+    },
+    "polls": [
+      {
+        "status": "queued"
+      },
+      {
+        "status": "running",
+        "progress": 0.3
+      },
+      {
+        "status": "succeeded"
+      }
+    ],
+    "artifacts": [
+      {
+        "ref": "artifacts/sim/vace/identity-basic/result.mp4",
+        "mediaType": "video/mp4"
+      }
+    ]
+  },
+  "observed": {
+    "qualityScores": {
+      "identity-preservation": 62,
+      "temporal-coherence": 61,
+      "motion-fidelity": 66
+    },
+    "latencyClass": "hours",
+    "reliability": 0.58,
+    "cost": {
+      "estimate": 0.18,
+      "unit": "compute-minutes"
+    }
+  },
+  "notes": "Simulated expectation pending live calibration. Below the identity-preservation threshold on this scenario \u2014 recorded as data (below-threshold class), not failure. Cost estimate = normalized USD for this scenario invocation (premium: output-seconds \u00d7 rate; open models: compute cost)."
+}

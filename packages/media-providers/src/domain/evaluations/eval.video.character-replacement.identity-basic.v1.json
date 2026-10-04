@@ -1,0 +1,97 @@
+{
+  "evaluationId": "eval.video.character-replacement.identity-basic.v1",
+  "capabilityId": "video.character-replacement",
+  "scenarioId": "identity-basic",
+  "mode": "mock",
+  "generatedAt": "2026-10-04T09:21:46.392Z",
+  "generator": "@gen/media-providers comparison harness v1 (mock mode)",
+  "rows": [
+    {
+      "providerId": "higgsfield",
+      "modelId": "genjutsu",
+      "executionAdapter": "higgsfield-http",
+      "qualityScores": {
+        "identity-preservation": 88,
+        "temporal-coherence": 79,
+        "motion-fidelity": 84
+      },
+      "normalizedQuality": 83.7,
+      "cost": {
+        "estimate": 3.6,
+        "unit": "per-second-of-output"
+      },
+      "latency": {
+        "class": "minutes"
+      },
+      "reliability": 0.97,
+      "invariants": {
+        "schema": "pass",
+        "qualityThresholds": "pass",
+        "perDimension": {
+          "identity-preservation": "pass",
+          "temporal-coherence": "pass",
+          "motion-fidelity": "pass"
+        }
+      },
+      "provenance": "simulated"
+    },
+    {
+      "providerId": "vace",
+      "executionAdapter": "vace-open-exec",
+      "qualityScores": {
+        "identity-preservation": 62,
+        "temporal-coherence": 61,
+        "motion-fidelity": 66
+      },
+      "normalizedQuality": 63,
+      "cost": {
+        "estimate": 0.18,
+        "unit": "compute-minutes"
+      },
+      "latency": {
+        "class": "hours"
+      },
+      "reliability": 0.58,
+      "invariants": {
+        "schema": "pass",
+        "qualityThresholds": "fail",
+        "perDimension": {
+          "identity-preservation": "fail",
+          "temporal-coherence": "fail",
+          "motion-fidelity": "fail"
+        }
+      },
+      "provenance": "simulated"
+    },
+    {
+      "providerId": "wan-2.2",
+      "modelId": "animate",
+      "executionAdapter": "wan-open-exec",
+      "qualityScores": {
+        "identity-preservation": 74,
+        "temporal-coherence": 70,
+        "motion-fidelity": 76
+      },
+      "normalizedQuality": 73.3,
+      "cost": {
+        "estimate": 0.24,
+        "unit": "compute-minutes"
+      },
+      "latency": {
+        "class": "minutes"
+      },
+      "reliability": 0.82,
+      "invariants": {
+        "schema": "pass",
+        "qualityThresholds": "pass",
+        "perDimension": {
+          "identity-preservation": "pass",
+          "temporal-coherence": "pass",
+          "motion-fidelity": "pass"
+        }
+      },
+      "provenance": "simulated"
+    }
+  ],
+  "notes": "Mock-mode conformance: adapters replay recorded fixture sets (no live credentials). Provenance stays 'simulated' until live calibration replaces the fixtures."
+}

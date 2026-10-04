@@ -1,0 +1,46 @@
+{
+  "adapterId": "higgsfield-http",
+  "providerId": "higgsfield",
+  "modelId": "genjutsu",
+  "capabilityId": "video.motion-transfer",
+  "scenarioId": "motion-fidelity-basic",
+  "provenance": "simulated",
+  "lifecycle": {
+    "submit": {
+      "status": "queued",
+      "requestId": "sim-hf-motion-basic-0001"
+    },
+    "polls": [
+      {
+        "status": "queued"
+      },
+      {
+        "status": "running",
+        "progress": 0.4
+      },
+      {
+        "status": "succeeded"
+      }
+    ],
+    "artifacts": [
+      {
+        "ref": "artifacts/sim/higgsfield/motion-fidelity-basic/result.mp4",
+        "mediaType": "video/mp4"
+      }
+    ]
+  },
+  "observed": {
+    "qualityScores": {
+      "motion-fidelity": 90,
+      "identity-preservation": 82,
+      "temporal-coherence": 80
+    },
+    "latencyClass": "minutes",
+    "reliability": 0.96,
+    "cost": {
+      "estimate": 3.0,
+      "unit": "per-second-of-output"
+    }
+  },
+  "notes": "Simulated expectation pending live calibration; endpoint is doc-confirmed (/higgsfield/genjutsu/motion-transfer/v1.0) and payload shape follows the docs (video_url + image_urls). Cost estimate = normalized USD for this scenario invocation (premium: output-seconds \u00d7 rate; open models: compute cost)."
+}

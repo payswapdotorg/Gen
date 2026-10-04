@@ -1,0 +1,37 @@
+{
+  "id": "video.restyle",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "video",
+  "summary": "Restyle a source video according to reference style images or a named style while preserving the underlying structure, motion and scene layout.",
+  "inputs": [
+    { "name": "sourceVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": ">= 480p, <= 4K, any fps" },
+    { "name": "styleReferences", "mediaType": "image/png", "cardinality": "one-or-more", "constraints": "style exemplars (palette, grain, era)" }
+  ],
+  "outputs": [
+    { "name": "resultVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": "matches source resolution/fps" }
+  ],
+  "parameters": [
+    { "name": "styleStrength", "type": "number", "minimum": 0, "maximum": 1, "default": 0.8, "description": "Strength of the style transfer." },
+    { "name": "preserveStructure", "type": "boolean", "default": true, "description": "Keep original composition and subject layout." }
+  ],
+  "qualityDimensions": [
+    { "id": "style-fidelity", "description": "Match to the requested style.", "scale": "0-100" },
+    { "id": "structure-preservation", "description": "Original structure/layout retained.", "scale": "0-100" },
+    { "id": "temporal-coherence", "description": "Flicker/coherence across frames.", "scale": "0-100" }
+  ],
+  "costModel": { "pricingUnit": "per-second-of-output", "currency": "USD", "notes": "Premium providers bill per output second; open models bill compute-minutes." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "higgsfield", "modelId": "genjutsu", "executionAdapter": "higgsfield-http", "maturity": "reference", "conformanceStatus": "unverified", "notes": "Video variant; image variant is image.restyle (future descriptor)." },
+    { "providerId": "ltx", "modelId": "ltx-video", "executionAdapter": "ltx-open-exec", "maturity": "experimental", "conformanceStatus": "unverified" },
+    { "providerId": "vace", "executionAdapter": "vace-open-exec", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "style-transfer-basic", "path": "packages/media-capabilities/src/domain/conformance/video.restyle/style-transfer-basic.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "The T2 'make this documentary cinematic' flow consumes this capability through the editor organization."
+}
