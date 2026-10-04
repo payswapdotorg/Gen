@@ -1,0 +1,21 @@
+{
+  "gapId": "gap.text-to-video",
+  "detectedAt": "2026-10-04T09:12:00Z",
+  "requestedCapability": {
+    "intent": "Generate a video clip from a text prompt without reference material — observed on the Higgsfield platform (and broadly available across open models).",
+    "capabilityId": "video.text-to-video"
+  },
+  "kind": "missing-capability",
+  "failureEvidence": {
+    "summary": "The launch capability set covers reference-conditioned work only; prompt-only generation has no descriptor or mapping. Provider descriptor lists it as planned (higgsfield.json).",
+    "routerDecisionTrace": "capability=video.text-to-video; rejection=capability-not-in-registry"
+  },
+  "impact": {
+    "goalClass": "shot-generation",
+    "severity": "low",
+    "frequency": "Workaround exists today via video.reference-handling with a generated still; native support preferred."
+  },
+  "arena": {
+    "state": "detected"
+  }
+}

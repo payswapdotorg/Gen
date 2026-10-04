@@ -1,0 +1,16 @@
+{
+  "id": "motion-fidelity-basic",
+  "capabilityId": "video.motion-transfer",
+  "description": "Baseline motion transfer: a 5s dance driving video is re-performed by one half-body character reference; motion timing and identity must both hold.",
+  "inputs": {
+    "drivingVideo": { "kind": "fixture-ref", "ref": "sample-sources/dance-720p-5s", "mediaType": "video/mp4", "durationSeconds": 5, "resolution": "1280x720" },
+    "characterImages": [
+      { "kind": "fixture-ref", "ref": "sample-sources/character-halfbody-01", "mediaType": "image/png", "resolution": "896x1152" }
+    ]
+  },
+  "parameters": { "preserveAudio": false, "resolution": "720p" },
+  "expectedOutputInvariants": {
+    "schema": { "outputPort": "resultVideo", "mediaType": "video/mp4", "cardinality": "one" },
+    "qualityThresholds": { "motion-fidelity": 70, "identity-preservation": 65, "temporal-coherence": 65 }
+  }
+}

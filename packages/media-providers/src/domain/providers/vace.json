@@ -1,0 +1,28 @@
+{
+  "providerId": "vace",
+  "kind": "open-model",
+  "access": {
+    "type": "api-key",
+    "envVars": ["VACE_EXECUTION_ENDPOINT", "VACE_API_KEY"],
+    "notes": "Open execution service endpoint; optional bearer token. Env names only (P8)."
+  },
+  "executionAdapter": {
+    "id": "vace-open-exec",
+    "transport": "remote-service",
+    "runtimeRequirements": "Open-execution service speaking the documented jobs protocol; VACE-class video editing backend."
+  },
+  "capabilities": [
+    { "capabilityId": "video.character-replacement", "maturity": "experimental", "conformanceStatus": "unverified" },
+    { "capabilityId": "video.motion-transfer", "maturity": "experimental", "conformanceStatus": "unverified" },
+    { "capabilityId": "video.object-replacement", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "Reference-conditioned video editing is VACE's core competence." },
+    { "capabilityId": "video.restyle", "maturity": "experimental", "conformanceStatus": "unverified" }
+  ],
+  "facts": {
+    "rateLimits": "Bounded by the open-execution deployment (self-hosted).",
+    "pricing": "compute-minutes; effectively infrastructure cost when self-hosted.",
+    "latencyFacts": "Minutes-to-hours class depending on clip length and GPU class."
+  },
+  "generationLifecycle": ["submit", "poll", "cancel", "retrieve"],
+  "errorTaxonomy": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"],
+  "notes": "Provider-neutral alternate (T3): accepts lower conformance scores where invariants are not met — data, not failure."
+}

@@ -1,0 +1,50 @@
+{
+  "adapterId": "higgsfield-http",
+  "providerId": "higgsfield",
+  "modelId": "genjutsu",
+  "capabilityId": "video.character-replacement",
+  "scenarioId": "identity-basic",
+  "provenance": "simulated",
+  "lifecycle": {
+    "submit": {
+      "status": "queued",
+      "requestId": "sim-hf-identity-basic-0001"
+    },
+    "polls": [
+      {
+        "status": "queued"
+      },
+      {
+        "status": "running",
+        "progress": 0.35
+      },
+      {
+        "status": "running",
+        "progress": 0.8
+      },
+      {
+        "status": "succeeded"
+      }
+    ],
+    "artifacts": [
+      {
+        "ref": "artifacts/sim/higgsfield/identity-basic/result.mp4",
+        "mediaType": "video/mp4"
+      }
+    ]
+  },
+  "observed": {
+    "qualityScores": {
+      "identity-preservation": 88,
+      "temporal-coherence": 79,
+      "motion-fidelity": 84
+    },
+    "latencyClass": "minutes",
+    "reliability": 0.97,
+    "cost": {
+      "estimate": 3.6,
+      "unit": "per-second-of-output"
+    }
+  },
+  "notes": "Simulated expectation pending live calibration; wire shape follows the documented Higgsfield request/status contract. Scores represent the Genjutsu reference baseline class, to be replaced by measured values. Cost estimate = normalized USD for this scenario invocation (premium: output-seconds \u00d7 rate; open models: compute cost)."
+}

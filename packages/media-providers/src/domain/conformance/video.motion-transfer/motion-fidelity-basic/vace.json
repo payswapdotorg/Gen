@@ -1,0 +1,45 @@
+{
+  "adapterId": "vace-open-exec",
+  "providerId": "vace",
+  "capabilityId": "video.motion-transfer",
+  "scenarioId": "motion-fidelity-basic",
+  "provenance": "simulated",
+  "lifecycle": {
+    "submit": {
+      "status": "queued",
+      "requestId": "sim-vace-motion-basic-0001"
+    },
+    "polls": [
+      {
+        "status": "queued"
+      },
+      {
+        "status": "running",
+        "progress": 0.2
+      },
+      {
+        "status": "succeeded"
+      }
+    ],
+    "artifacts": [
+      {
+        "ref": "artifacts/sim/vace/motion-fidelity-basic/result.mp4",
+        "mediaType": "video/mp4"
+      }
+    ]
+  },
+  "observed": {
+    "qualityScores": {
+      "motion-fidelity": 71,
+      "identity-preservation": 63,
+      "temporal-coherence": 64
+    },
+    "latencyClass": "hours",
+    "reliability": 0.6,
+    "cost": {
+      "estimate": 0.15,
+      "unit": "compute-minutes"
+    }
+  },
+  "notes": "Simulated expectation pending live calibration; passes the motion threshold, borderline on identity. Cost estimate = normalized USD for this scenario invocation (premium: output-seconds \u00d7 rate; open models: compute cost)."
+}

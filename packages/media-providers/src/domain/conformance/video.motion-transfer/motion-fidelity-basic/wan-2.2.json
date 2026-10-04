@@ -1,0 +1,46 @@
+{
+  "adapterId": "wan-open-exec",
+  "providerId": "wan-2.2",
+  "modelId": "animate",
+  "capabilityId": "video.motion-transfer",
+  "scenarioId": "motion-fidelity-basic",
+  "provenance": "simulated",
+  "lifecycle": {
+    "submit": {
+      "status": "queued",
+      "requestId": "sim-wan-motion-basic-0001"
+    },
+    "polls": [
+      {
+        "status": "queued"
+      },
+      {
+        "status": "running",
+        "progress": 0.5
+      },
+      {
+        "status": "succeeded"
+      }
+    ],
+    "artifacts": [
+      {
+        "ref": "artifacts/sim/wan-2.2/motion-fidelity-basic/result.mp4",
+        "mediaType": "video/mp4"
+      }
+    ]
+  },
+  "observed": {
+    "qualityScores": {
+      "motion-fidelity": 78,
+      "identity-preservation": 69,
+      "temporal-coherence": 71
+    },
+    "latencyClass": "minutes",
+    "reliability": 0.81,
+    "cost": {
+      "estimate": 0.2,
+      "unit": "compute-minutes"
+    }
+  },
+  "notes": "Simulated expectation pending live calibration; motion transfer is Animate's core competence. Cost estimate = normalized USD for this scenario invocation (premium: output-seconds \u00d7 rate; open models: compute cost)."
+}

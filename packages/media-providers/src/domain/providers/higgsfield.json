@@ -1,0 +1,34 @@
+{
+  "providerId": "higgsfield",
+  "kind": "api",
+  "access": {
+    "type": "api-key",
+    "envVars": ["HIGGSFIELD_API_KEY"],
+    "apiKeyManagementUrl": "https://higgsfield.ai/settings/api-keys",
+    "notes": "Operator provisions the key via env (value format: the full 'Key' credential). Login email/password are operator material — the adapter never consumes the login pair."
+  },
+  "executionAdapter": {
+    "id": "higgsfield-http",
+    "transport": "http",
+    "runtimeRequirements": "Outbound HTTPS; no GPU."
+  },
+  "capabilities": [
+    { "capabilityId": "video.character-replacement", "maturity": "reference", "conformanceStatus": "self-verified", "notes": "Mock-mode conformance recorded; live calibration pending credentials." },
+    { "capabilityId": "video.motion-transfer", "maturity": "reference", "conformanceStatus": "self-verified", "notes": "Doc-confirmed endpoint /higgsfield/genjutsu/motion-transfer/v1.0; mock-mode conformance recorded." },
+    { "capabilityId": "video.object-replacement", "maturity": "reference", "conformanceStatus": "unverified" },
+    { "capabilityId": "video.restyle", "maturity": "reference", "conformanceStatus": "unverified" },
+    { "capabilityId": "video.reference-handling", "maturity": "reference", "conformanceStatus": "unverified" },
+    { "capabilityId": "video.camera-motion-control", "maturity": "planned", "conformanceStatus": "unverified", "notes": "Observed on the platform (Genjutsu camera moves); no mapping yet — gap report gap.camera-motion-control." },
+    { "capabilityId": "video.lipsync", "maturity": "planned", "conformanceStatus": "unverified", "notes": "Observed on the platform; no mapping yet — gap report gap.lipsync." },
+    { "capabilityId": "video.text-to-video", "maturity": "planned", "conformanceStatus": "unverified", "notes": "Observed on the platform; no mapping yet — gap report gap.text-to-video." }
+  ],
+  "facts": {
+    "rateLimits": "Observed limits recorded by the adapter at runtime; see harness evaluations.",
+    "pricing": "Per-second-of-output premium tier; exact prices in pricing facts table.",
+    "latencyFacts": "Minutes-class jobs for typical clips.",
+    "healthCheck": "GET /health on the API base"
+  },
+  "generationLifecycle": ["submit", "poll", "stream", "cancel", "retrieve"],
+  "errorTaxonomy": ["retryable", "capacity", "auth", "validation", "unsupported", "provider-internal"],
+  "notes": "Reference provider: the compatibility baseline for the Genjutsu capability set (spec/media-provider-contract.md §4). Wire shape grounded in the public API docs; non-doc-confirmed paths are marked provisional in the adapter endpoint map."
+}

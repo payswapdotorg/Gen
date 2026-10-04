@@ -1,0 +1,16 @@
+{
+  "id": "identity-basic",
+  "capabilityId": "video.character-replacement",
+  "description": "Baseline identity swap: one frontal reference character replaces the main subject of a 6s 720p source clip; identity must hold across the full duration.",
+  "inputs": {
+    "sourceVideo": { "kind": "fixture-ref", "ref": "sample-sources/walkway-720p-6s", "mediaType": "video/mp4", "durationSeconds": 6, "resolution": "1280x720" },
+    "referenceCharacter": [
+      { "kind": "fixture-ref", "ref": "sample-sources/character-frontal-01", "mediaType": "image/png", "resolution": "1024x1024" }
+    ]
+  },
+  "parameters": { "preserveAudio": true, "identityStrength": 0.85 },
+  "expectedOutputInvariants": {
+    "schema": { "outputPort": "resultVideo", "mediaType": "video/mp4", "cardinality": "one" },
+    "qualityThresholds": { "identity-preservation": 70, "temporal-coherence": 65, "motion-fidelity": 70 }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "video.object-replacement",
+  "version": "1.0.0",
+  "status": "draft",
+  "domain": "video",
+  "summary": "Replace a targeted object in a source video with a reference object across all frames, preserving occlusion, lighting and camera motion.",
+  "inputs": [
+    { "name": "sourceVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": ">= 480p, <= 4K, any fps" },
+    { "name": "referenceObject", "mediaType": "image/png", "cardinality": "one-or-more", "constraints": "clean product/object reference shots" },
+    { "name": "targetRegion", "mediaType": "application/vnd.gen.mask+png", "cardinality": "zero-or-one", "constraints": "mask or bounding hint of the object to replace" }
+  ],
+  "outputs": [
+    { "name": "resultVideo", "mediaType": "video/mp4", "cardinality": "one", "constraints": "matches source resolution/fps" }
+  ],
+  "parameters": [
+    { "name": "preserveAudio", "type": "boolean", "default": true, "description": "Carry the source audio track." },
+    { "name": "blendStrength", "type": "number", "minimum": 0, "maximum": 1, "default": 0.9, "description": "How strongly the replacement replaces the original object." }
+  ],
+  "qualityDimensions": [
+    { "id": "object-fidelity", "description": "Replacement object fidelity (shape, texture, logo).", "scale": "0-100" },
+    { "id": "temporal-coherence", "description": "Stability of the replacement across frames.", "scale": "0-100" },
+    { "id": "scene-consistency", "description": "Occlusion, lighting and shadow plausibility.", "scale": "0-100" }
+  ],
+  "costModel": { "pricingUnit": "per-second-of-output", "currency": "USD", "notes": "Premium providers bill per output second; open models bill compute-minutes." },
+  "latencyClass": "minutes",
+  "providerMappings": [
+    { "providerId": "higgsfield", "modelId": "genjutsu", "executionAdapter": "higgsfield-http", "maturity": "reference", "conformanceStatus": "unverified", "notes": "Endpoint path follows the documented Genjutsu path convention; conformance pending." },
+    { "providerId": "vace", "executionAdapter": "vace-open-exec", "maturity": "experimental", "conformanceStatus": "unverified", "notes": "Reference-conditioned video editing is VACE's core competence." }
+  ],
+  "conformance": {
+    "scenarios": [
+      { "id": "object-swap-basic", "path": "packages/media-capabilities/src/domain/conformance/video.object-replacement/object-swap-basic.json" }
+    ],
+    "certification": "none"
+  },
+  "notes": "Acceptance T3 targets this capability with cheapest-reliable routing (open models over premium when invariants allow)."
+}

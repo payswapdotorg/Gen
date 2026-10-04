@@ -1,0 +1,21 @@
+{
+  "gapId": "gap.camera-motion-control",
+  "detectedAt": "2026-10-04T09:12:00Z",
+  "requestedCapability": {
+    "intent": "Apply authored camera motion (bullet time, crash zoom, 360 orbit) to a generated or edited shot — observed on the Higgsfield Genjutsu platform.",
+    "capabilityId": "video.camera-motion-control"
+  },
+  "kind": "missing-capability",
+  "failureEvidence": {
+    "summary": "Genjutsu exposes camera motion controls that Gen cannot route yet: no capability descriptor exists and no execution adapter maps the operation. Provider descriptor lists it as planned (higgsfield.json).",
+    "routerDecisionTrace": "capability=video.camera-motion-control; rejection=capability-not-in-registry"
+  },
+  "impact": {
+    "goalClass": "cinematic-shot-authoring",
+    "severity": "medium",
+    "frequency": "Common in cinematic intents; blocking for shot-level camera language."
+  },
+  "arena": {
+    "state": "detected"
+  }
+}
