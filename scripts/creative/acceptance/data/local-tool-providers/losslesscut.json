@@ -1,0 +1,28 @@
+{
+  "providerId": "losslesscut",
+  "kind": "software-tool",
+  "access": {
+    "type": "none",
+    "notes": "Local binary; no credentials (P8)."
+  },
+  "executionAdapter": {
+    "id": "losslesscut-cli",
+    "transport": "cli",
+    "runtimeRequirements": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+  },
+  "capabilities": [
+    {
+      "capabilityId": "editor.cut-video",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "keyframe-aligned stream-copy cut (headless mode per W2 mode evaluation)"
+    }
+  ],
+  "facts": {
+    "rateLimits": "none (local process spawn; sandbox concurrency governs)",
+    "pricing": "compute-minutes only; no per-call cost",
+    "latencyFacts": "subsecond per cut (stream-copy)",
+    "healthCheck": "binary version probe before spawn (adapter-side)"
+  },
+  "notes": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+}

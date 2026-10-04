@@ -1,0 +1,34 @@
+{
+  "providerId": "kdenlive",
+  "kind": "software-tool",
+  "access": {
+    "type": "none",
+    "notes": "Local binary; no credentials (P8)."
+  },
+  "executionAdapter": {
+    "id": "kdenlive-render",
+    "transport": "cli",
+    "runtimeRequirements": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+  },
+  "capabilities": [
+    {
+      "capabilityId": "editor.cut-video",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "project EDL cut"
+    },
+    {
+      "capabilityId": "editor.render-project",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "render via melt backend"
+    }
+  ],
+  "facts": {
+    "rateLimits": "none (local process spawn; sandbox concurrency governs)",
+    "pricing": "compute-minutes only; no per-call cost",
+    "latencyFacts": "seconds startup; render minutes-scale",
+    "healthCheck": "binary version probe before spawn (adapter-side)"
+  },
+  "notes": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+}

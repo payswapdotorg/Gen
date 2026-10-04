@@ -1,0 +1,46 @@
+{
+  "providerId": "blender",
+  "kind": "software-tool",
+  "access": {
+    "type": "none",
+    "notes": "Local binary; no credentials (P8)."
+  },
+  "executionAdapter": {
+    "id": "blender-headless",
+    "transport": "cli",
+    "runtimeRequirements": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+  },
+  "capabilities": [
+    {
+      "capabilityId": "editor.create-animation",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "headless Python script builder"
+    },
+    {
+      "capabilityId": "editor.track-object",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "motion tracking via generated Python"
+    },
+    {
+      "capabilityId": "editor.composite-layer",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "VSE strips + node compositing"
+    },
+    {
+      "capabilityId": "editor.render-project",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "VSE project render"
+    }
+  ],
+  "facts": {
+    "rateLimits": "none (local process spawn; sandbox concurrency governs)",
+    "pricing": "compute-minutes only; no per-call cost",
+    "latencyFacts": "seconds startup; render minutes-scale",
+    "healthCheck": "binary version probe before spawn (adapter-side)"
+  },
+  "notes": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+}

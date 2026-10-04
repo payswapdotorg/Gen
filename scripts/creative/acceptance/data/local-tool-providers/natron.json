@@ -1,0 +1,28 @@
+{
+  "providerId": "natron",
+  "kind": "software-tool",
+  "access": {
+    "type": "none",
+    "notes": "Local binary; no credentials (P8)."
+  },
+  "executionAdapter": {
+    "id": "natron-cli",
+    "transport": "cli",
+    "runtimeRequirements": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+  },
+  "capabilities": [
+    {
+      "capabilityId": "editor.composite-layer",
+      "maturity": "experimental",
+      "conformanceStatus": "self-verified",
+      "notes": "node-graph compositing via generated Python"
+    }
+  ],
+  "facts": {
+    "rateLimits": "none (local process spawn; sandbox concurrency governs)",
+    "pricing": "compute-minutes only; no per-call cost",
+    "latencyFacts": "seconds startup; render minutes-scale",
+    "healthCheck": "binary version probe before spawn (adapter-side)"
+  },
+  "notes": "Phase 2 TL glue: local software tool registered into the provider plane (tier local)."
+}
