@@ -100,6 +100,28 @@ test("scenario A: certified organization visible (bodies + models + certificatio
   );
 });
 
+test("scenario A: certification evidence surfaces certifiedAt + gapReportsResolved from the committed org record", async () => {
+  const mount = await mountOf("documentary-cinematic");
+  // Scenario A mounts carry NO organizationEvaluation summary — the committed
+  // organization record's evaluation.certificationEvidence is the fallback
+  // source (work/worker-8-view-completeness.md: both fields must surface).
+  const evidence = mount.organization?.certificationEvidence;
+  assert.ok(evidence, "the certification evidence block must be present");
+  // Exact committed values from
+  // packages/agent-lab/src/domain/organizations/org.documentary-cinematic-remaster-cand-04.json
+  assert.equal(evidence?.certifiedAt, "2026-10-04T08:00:00.000Z");
+  assert.equal(evidence?.gapReportsResolved, true);
+  assert.equal(evidence?.scenarioSetRef, "packages/agent-lab/src/domain/scenarios");
+  assert.equal(
+    evidence?.replayRef,
+    "packages/agent-lab/src/domain/evaluations/eval.org.documentary-cinematic-remaster-cand-04.json",
+  );
+  // The fields are user-visible too (P4/P6: committed evidence, not chat).
+  const markup = renderToStaticMarkup(createElement(WorkspaceView, { mount }));
+  assert.ok(markup.includes("certified at: 2026-10-04T08:00:00.000Z"));
+  assert.ok(markup.includes("gap reports resolved: true"));
+});
+
 test("scenario A: nothing blocked; two alternatives with catalog deltas", async () => {
   const mount = await mountOf("documentary-cinematic");
   assert.equal(mount.planView.blocked.length, 0);

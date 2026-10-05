@@ -205,11 +205,21 @@ function buildOrganizationView(
               summary?.certificationEvidence?.replayRef ??
               graph.evaluation?.certificationEvidence?.replayRef ??
               "",
-            ...(summary?.certificationEvidence?.certifiedAt !== undefined
-              ? { certifiedAt: summary.certificationEvidence.certifiedAt }
+            ...(summary?.certificationEvidence?.certifiedAt !== undefined ||
+            graph.evaluation?.certificationEvidence?.certifiedAt !== undefined
+              ? {
+                  certifiedAt:
+                    summary?.certificationEvidence?.certifiedAt ??
+                    graph.evaluation?.certificationEvidence?.certifiedAt,
+                }
               : {}),
-            ...(summary?.certificationEvidence?.gapReportsResolved !== undefined
-              ? { gapReportsResolved: summary.certificationEvidence.gapReportsResolved }
+            ...(summary?.certificationEvidence?.gapReportsResolved !== undefined ||
+            graph.evaluation?.certificationEvidence?.gapReportsResolved !== undefined
+              ? {
+                  gapReportsResolved:
+                    summary?.certificationEvidence?.gapReportsResolved ??
+                    graph.evaluation?.certificationEvidence?.gapReportsResolved,
+                }
               : {}),
           },
         }
