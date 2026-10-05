@@ -1,0 +1,19 @@
+{
+  "artifactId": "art.src-video",
+  "contentAddress": "sha256:fd4948c40c0df7af927d2ce056f74ccabc8b2e0d7ab3c933360b39c6e1d36576",
+  "mediaType": "video/mp4",
+  "producedBy": {
+    "capabilityId": "orchestration.ingest-media",
+    "executionAdapter": "workspace-ingest",
+    "executionId": "ingest-run-0009-001"
+  },
+  "metadata": {
+    "durationSeconds": 96,
+    "resolution": "1280x720",
+    "fps": 25
+  },
+  "storage": {
+    "storeRef": "runs/run-0009/media/source-interview.mp4",
+    "sizeBytes": 36864000
+  }
+}

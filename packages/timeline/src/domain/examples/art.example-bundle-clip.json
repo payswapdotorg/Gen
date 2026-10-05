@@ -1,0 +1,23 @@
+{
+  "artifactId": "art.example-bundle-clip",
+  "contentAddress": "sha256:6403e42c0ed8e338d1abe3f050b5bb4ddd22302e2757b2d64b3d10d3b1fae42a",
+  "mediaType": "application/vnd.gen.timeline-item+json",
+  "producedBy": {
+    "capabilityId": "orchestration.compose-timeline",
+    "executionId": "example-compose-001",
+    "agentInstanceId": "example-run-n1"
+  },
+  "derivedFrom": ["art.example-timeline-bundle"],
+  "timelineRef": {
+    "otioPath": "tracks/0/0",
+    "timelineArtifactId": "art.example-timeline-bundle"
+  },
+  "metadata": {
+    "otioKind": "Clip.1",
+    "sourceRange": { "start": 0, "duration": 192, "rate": 24 }
+  },
+  "storage": {
+    "storeRef": "examples/timelines/example-bundle.json#tracks/0/0",
+    "sizeBytes": 256
+  }
+}

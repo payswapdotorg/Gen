@@ -1,0 +1,18 @@
+{
+  "artifactId": "art.reference-character-a",
+  "contentAddress": "sha256:7bc9301313988c3a82cb9de15a368dea1166e014943554de9dcf409be0394462",
+  "mediaType": "image/png",
+  "producedBy": {
+    "capabilityId": "orchestration.ingest-media",
+    "executionAdapter": "workspace-ingest",
+    "executionId": "ingest-run-0009-002"
+  },
+  "metadata": {
+    "resolution": "1024x1024",
+    "subject": "reference-character-a"
+  },
+  "storage": {
+    "storeRef": "runs/run-0009/media/reference-character-a.png",
+    "sizeBytes": 1048576
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "artifactId": "art.example-bundle-track",
+  "contentAddress": "sha256:1035a5058ec08caf6c599d01dc724a5df096c62acf9f08e8b6f4ec0e87f209de",
+  "mediaType": "application/vnd.gen.timeline-track+json",
+  "producedBy": {
+    "capabilityId": "orchestration.compose-timeline",
+    "executionId": "example-compose-001",
+    "agentInstanceId": "example-run-n1"
+  },
+  "derivedFrom": ["art.example-timeline-bundle"],
+  "timelineRef": {
+    "otioPath": "tracks/0",
+    "timelineArtifactId": "art.example-timeline-bundle"
+  },
+  "metadata": {
+    "kind": "Video",
+    "name": "V1",
+    "itemCount": 2
+  }
+}
