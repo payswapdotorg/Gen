@@ -34,6 +34,26 @@ export { validateOrganizationGraph } from "./domain/org-graph.js";
 export { searchOrganizations, DEFAULT_DIMENSIONS } from "./domain/search.js";
 export { ROLE_TEMPLATES, findRoleTemplate } from "./domain/search-templates.js";
 export { runSimulation } from "./domain/simulation/engine.js";
+export type { SimulationConfig } from "./domain/simulation/engine.js";
+export type {
+  AppliedRedirect,
+  BundleAlternative,
+  DecisionBundle,
+  DecisionBundleRecord,
+  DecisionPort,
+  DecisionRecordInput,
+  HumanDecision,
+  HumanDecisionRecord,
+  ModelBindingDiff,
+  PolicyDiffEntry,
+  RedirectPayload,
+  RunRecordWithOptionalTrail,
+  SimulationRunRecordWithDecisions,
+} from "./domain/simulation/decision-types.js";
+export { buildDecisionRecord, decisionTrailOf } from "./domain/simulation/decision-types.js";
+export { buildDecisionBundle, projectRemainingSpendUsd } from "./domain/simulation/decision-bundle.js";
+export { ROUTING_POLICIES, applyRedirect } from "./domain/simulation/decision-redirect.js";
+export type { RedirectableRunState, RedirectDeps } from "./domain/simulation/decision-redirect.js";
 export type {
   BodyBehavior,
   CapabilityMock,
@@ -43,7 +63,7 @@ export type {
   ScenarioDefect,
   ScenarioDescriptor,
 } from "./domain/simulation/scenario-types.js";
-export { bodyBehavior, mockFor } from "./domain/simulation/scenario-types.js";
+export { bodyBehavior, mockFor, nextScriptedDecision } from "./domain/simulation/scenario-types.js";
 export { canonicalJson, fnv1a32, replayHash, seedFromString } from "./domain/simulation/rng.js";
 export {
   SCENARIOS,
@@ -61,6 +81,8 @@ export type {
   LabServiceDeps,
   RankedCandidate,
 } from "./app/lab-service.js";
+export { createInteractiveDecisionPort, createScriptedDecisionPort } from "./app/decision-ports.js";
+export type { DecisionHandler, InteractiveDecisionPort } from "./app/decision-ports.js";
 export {
   createFsEvaluationStore,
   listEvaluationRecordFiles,

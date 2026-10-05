@@ -11,6 +11,7 @@ import type {
   GapSeverity,
   ModelCatalogEntry,
 } from "../../contract.js";
+import type { HumanDecision, RedirectPayload } from "./decision-types.js";
 
 export interface MockMappingCandidate {
   readonly providerId: string;
@@ -59,7 +60,34 @@ export interface ScenarioCriterion {
 
 export interface ScenarioApproval {
   readonly gate: string;
-  readonly response: "approve" | "reject";
+  readonly response: "approve" | "reject" | "redirect";
+  /** Redirect payload (required when response = "redirect" — W6 escalation §3). */
+  readonly redirect?: RedirectPayload;
+}
+
+/**
+ * Scripted decision resolution (W6): replays scenario.approvals exactly as
+ * the engine did before the decision port existed — same cursor modulo, same
+ * default-approve fallback — so the scripted path stays bit-exact with the
+ * committed records. A "redirect" entry without a payload is a hermetic
+ * fixture error and fails loudly (never a fabricated decision).
+ */
+export function nextScriptedDecision(
+  approvals: readonly ScenarioApproval[],
+  cursor: number,
+): HumanDecision {
+  const entry = approvals[cursor % Math.max(approvals.length, 1)];
+  if (entry === undefined) return { kind: "approve" };
+  if (entry.response === "reject") return { kind: "reject" };
+  if (entry.response === "redirect") {
+    if (entry.redirect === undefined) {
+      throw new Error(
+        `scenario approval gate "${entry.gate}" says "redirect" but carries no redirect payload (hermetic fixture error)`,
+      );
+    }
+    return { kind: "redirect", redirect: entry.redirect };
+  }
+  return { kind: "approve" };
 }
 
 export interface ScenarioDescriptor {

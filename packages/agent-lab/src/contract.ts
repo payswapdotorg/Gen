@@ -269,3 +269,29 @@ export interface SimulationRunRecord {
  * check: forbidCycles). contract.ts stays a self-contained schema mirror.
  */
 
+/**
+ * Human decision-trail VIEW types (escalation contract §3, work order W6).
+ * The trail itself rides on run records as a SEPARATE extension keyed by
+ * approval-event seq and is NEVER part of the replayHash input. The
+ * engine-facing types (bundle, decision, port, records) live in
+ * ./domain/simulation/decision-types.ts — same pattern as domain/lab-api.ts —
+ * and are surfaced through src/index.ts; decisionTrailOf(runRecord) builds
+ * this view (pure, P4 tie-in).
+ */
+export interface DecisionTrailEntryView {
+  readonly eventSeq: number;
+  readonly gate: string;
+  readonly actor: string;
+  readonly atMs: number;
+  readonly decision: "approve" | "reject" | "redirect";
+  readonly summary: string;
+  readonly alternatives: readonly string[];
+  readonly applied: boolean;
+  readonly notes: readonly string[];
+}
+
+export interface DecisionTrailView {
+  readonly runId: string;
+  readonly scenarioId: string;
+  readonly entries: readonly DecisionTrailEntryView[];
+}
