@@ -1,5 +1,5 @@
 # app layer
 
-Same layering rules as packages (ARCHITECTURE_LOCK.md §4); `ui` depends only on contract surfaces.
+- `workspace-service.ts`: composes workspace mounts through the record-source port (domain/records.ts); validates every plan against the task-plan zod binding before projection — schema-invalid plans are refused, never rendered as fact.
 
-Phase 0 placeholder — TL-owned integration surface (Phase 2).
+Layer rules (ARCHITECTURE_LOCK.md §4): side-effect decisions through ports; the filesystem record source lives in `adapters/`.
