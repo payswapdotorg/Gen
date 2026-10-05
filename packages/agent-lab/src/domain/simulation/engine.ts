@@ -4,8 +4,18 @@
  * Produces run records: event traces, artifacts, cost/latency accounting,
  * per-node telemetry (bounded) and TaskPlan streams (P4). Failures surface as
  * gap signals (P5) — never fabricated results.
+ *
+ * W6 (spec/human-escalation-contract.md §3): approval gates surface a
+ * DecisionBundle (plan delta, cost impact, alternatives) and pause for a
+ * HumanDecision through a DecisionPort. The default port replays
+ * scenario.approvals — bit-exact with the pre-W6 engine (regression-locked).
+ * Redirects (policy patch / model swap / input supply) are applied between
+ * the same deterministic loop's steps; the decision bundles and trail are
+ * run-record extensions keyed by approval-event seq and NEVER enter the
+ * replayHash input.
  */
 import type {
+  CognitiveModelBinding,
   GapSignalDraft,
   OrganizationGraph,
   SimulationEvent,
@@ -13,13 +23,32 @@ import type {
   TaskPlan,
 } from "../../contract.js";
 import type { CapabilityMock, ScenarioDescriptor } from "./scenario-types.js";
-import { bodyBehavior, mockFor, severityFor } from "./scenario-types.js";
-import { buildPlanUpdate, isoFromClock } from "./task-plan.js";
+import { bodyBehavior, mockFor, nextScriptedDecision } from "./scenario-types.js";
+import { buildPlanUpdate } from "./task-plan.js";
 import { replayHash, seedFromString } from "./rng.js";
+import { bodyRegistry } from "../bodies/registry.js";
+import { evaluateCriteria } from "./criteria.js";
+import { buildGapSignal } from "./gap-signal.js";
+import { buildDecisionBundle } from "./decision-bundle.js";
+import { applyRedirect } from "./decision-redirect.js";
+import type { RedirectableRunState, RedirectDeps } from "./decision-redirect.js";
+import { buildDecisionRecord } from "./decision-types.js";
+import type {
+  DecisionBundleRecord,
+  DecisionPort,
+  HumanDecisionRecord,
+  SimulationRunRecordWithDecisions,
+} from "./decision-types.js";
 
 export interface SimulationConfig {
   /** Bound on recorded events (telemetry is bounded, organization-lab §3). */
   readonly maxEvents?: number;
+  /**
+   * Port resolving human decisions at approval gates. Defaults to the
+   * scripted replay of scenario.approvals (bit-exact with the committed
+   * records) — supply an interactive port to drive redirects.
+   */
+  readonly decisionPort?: DecisionPort;
 }
 
 const DEFAULT_MAX_EVENTS = 500;
@@ -48,7 +77,7 @@ export function runSimulation(
   scenario: ScenarioDescriptor,
   graph: OrganizationGraph,
   config: SimulationConfig = {},
-): SimulationRunRecord {
+): SimulationRunRecordWithDecisions {
   const maxEvents = config.maxEvents ?? DEFAULT_MAX_EVENTS;
   const rng = seedFromString(`${scenario.seed}::${graph.id}`);
   const runId = `run-${scenario.id}-${replayHash({ graph: graph.id, seed: scenario.seed }).slice(0, 6)}`;
@@ -66,12 +95,41 @@ export function runSimulation(
   const decisionsByNode = new Map<string, number>();
   const bodyByNode = new Map<string, string>();
   const invokedCapabilities = new Set<string>();
+  const decisionBundles: DecisionBundleRecord[] = [];
+  const decisionTrail: HumanDecisionRecord[] = [];
+  const redirectDeps: RedirectDeps = {
+    modelCatalog: scenario.modelCatalog,
+    bodyRegistry,
+    graph,
+    existingInputs: scenario.inputArtifacts,
+  };
+  const modelByNode = new Map<string, CognitiveModelBinding>();
+  const routingPolicyByNode = new Map<string, string>();
+  for (const node of graph.nodes) {
+    if (node.agentInstance) modelByNode.set(node.nodeId, node.agentInstance.cognitiveModel);
+    if (node.capabilityInvocation?.providerPolicy) {
+      routingPolicyByNode.set(node.nodeId, node.capabilityInvocation.providerPolicy);
+    }
+  }
+  let runState: RedirectableRunState = { modelByNode, routingPolicyByNode, suppliedInputs: [] };
   let clockMs = 0;
   let totalSpend = 0;
   let approvalCount = 0;
+  let approvalCursor = 0;
   let finished = true;
   let failureReason: string | undefined;
   let artifactSeq = 0;
+  const decisionPort: DecisionPort = config.decisionPort ?? {
+    resolveDecision: () => {
+      const decision = nextScriptedDecision(scenario.approvals, approvalCursor);
+      approvalCursor += 1;
+      return decision;
+    },
+  };
+  const catalogModelOf = (binding: CognitiveModelBinding) =>
+    scenario.modelCatalog.find(
+      (entry) => entry.providerId === binding.providerId && entry.modelId === binding.modelId,
+    );
 
   const emit = (event: Omit<SimulationEvent, "seq">): number => {
     const seq = events.length + 1;
@@ -116,48 +174,18 @@ export function runSimulation(
       });
       return;
     }
-    const failure = mock.failure ?? {
-      kind: "missing-capability" as const,
-      summary: `Capability ${mock.capabilityId} is not available for this goal class.`,
-    };
-    const gapId = `gap.${scenario.id}-${mock.capabilityId.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`;
-    const comparison = (mock.mappingCandidates ?? [])
-      .map((candidate) => `${candidate.providerId}${candidate.modelId ? `/${candidate.modelId}` : ""} rejected: ${candidate.rejectedBecause}`)
-      .join(" | ");
-    gapSignals.push({
-      gapId,
-      detectedAt: isoFromClock(scenario.clockEpochIso, clockMs),
-      requestedCapability: {
-        intent: `${scenario.goal} (capability ${mock.capabilityId})`,
-        capabilityId: mock.capabilityId,
-        parameters,
-      },
-      kind: failure.kind,
-      failureEvidence: {
-        summary: failure.summary,
-        routerDecisionTrace: failure.routerDecisionTrace ?? (comparison ? `Mock router trace: ${comparison}` : undefined),
-        comparisonTableRef: failure.comparisonTableRef,
-        adapterErrorRecords: failure.adapterErrorRecords,
-        organizationRunRef: runRef,
-        artifactRefs: [...scenario.inputArtifacts],
-      },
-      impact: {
-        goalClass: scenario.goalClass,
-        severity: severityFor(failure.kind),
-        frequency: "Forced by scenario fixture.",
-      },
-    });
+    const signal = buildGapSignal({ scenario, mock, parameters, clockMs, runRef });
+    gapSignals.push(signal);
     emit({
       type: "gap-signaled",
       atMs: clockMs,
       node: nodeId,
-      detail: `Capability gap ${gapId} (${failure.kind}): ${failure.summary}`,
+      detail: `Capability gap ${signal.gapId} (${signal.kind}): ${signal.failureEvidence.summary}`,
     });
   };
 
   const stages = topoStages(graph);
   const completedStages: { stageId: string; evidenceEventSeqs: number[] }[] = [];
-  let approvalCursor = 0;
   for (const stage of stages) {
     const stageSeqs: number[] = [];
     stageSeqs.push(
@@ -174,12 +202,8 @@ export function runSimulation(
       if (node.kind === "agent-instance" && node.agentInstance) {
         const bodyId = node.agentInstance.bodyId;
         bodyByNode.set(nodeId, bodyId);
-        const model = scenario.modelCatalog.find(
-          (entry) =>
-            entry.providerId === node.agentInstance?.cognitiveModel.providerId &&
-            entry.modelId === node.agentInstance?.cognitiveModel.modelId,
-        );
-        const behavior = bodyBehavior(scenario, bodyId, model);
+        const binding = runState.modelByNode.get(nodeId) ?? node.agentInstance.cognitiveModel;
+        const behavior = bodyBehavior(scenario, bodyId, catalogModelOf(binding));
         decisionsByNode.set(nodeId, (decisionsByNode.get(nodeId) ?? 0) + 1);
         clockMs += behavior.decisionLatencyMs;
         totalSpend += behavior.decisionCostUsd;
@@ -188,7 +212,7 @@ export function runSimulation(
           type: "node-acted",
           atMs: clockMs,
           node: nodeId,
-          detail: `${nodeLabel(nodeId)} acted (model ${node.agentInstance.cognitiveModel.providerId}/${node.agentInstance.cognitiveModel.modelId}).`,
+          detail: `${nodeLabel(nodeId)} acted (model ${binding.providerId}/${binding.modelId}).`,
         });
         for (const capabilityId of graph.allocations.toolAllocation?.[nodeId] ?? []) {
           const mock = mockFor(scenario, capabilityId);
@@ -214,12 +238,8 @@ export function runSimulation(
       if (edge.kind !== "review" || !stage.nodeIds.includes(edge.from)) continue;
       const reviewer = graph.nodes.find((candidate) => candidate.nodeId === edge.from);
       if (!reviewer?.agentInstance) continue;
-      const model = scenario.modelCatalog.find(
-        (entry) =>
-          entry.providerId === reviewer.agentInstance?.cognitiveModel.providerId &&
-          entry.modelId === reviewer.agentInstance?.cognitiveModel.modelId,
-      );
-      const behavior = bodyBehavior(scenario, reviewer.agentInstance.bodyId, model);
+      const binding = runState.modelByNode.get(edge.from) ?? reviewer.agentInstance.cognitiveModel;
+      const behavior = bodyBehavior(scenario, reviewer.agentInstance.bodyId, catalogModelOf(binding));
       const producedByTarget = artifacts.filter((artifact) => producerOf.get(artifact) === edge.to);
       for (const artifact of producedByTarget) {
         if (defectiveArtifacts.has(artifact)) {
@@ -243,18 +263,60 @@ export function runSimulation(
         }
       }
     }
+    const upcomingStages = stages
+      .slice(stages.indexOf(stage) + 1)
+      .map((entry) => ({ stageId: entry.stageId, nodeIds: [...entry.nodeIds] }));
     for (const edge of graph.edges) {
       if (edge.kind !== "approval" || !stage.nodeIds.includes(edge.from)) continue;
-      const response =
-        scenario.approvals[approvalCursor % Math.max(scenario.approvals.length, 1)]?.response ?? "approve";
-      approvalCursor += 1;
+      const gate = edge.notes ?? "approval";
+      const approver = {
+        nodeId: edge.to,
+        role: graph.nodes.find((candidate) => candidate.nodeId === edge.to)?.human?.role ?? "human",
+      };
+      const bundle = buildDecisionBundle({
+        scenario,
+        graph,
+        bodyRegistry,
+        runId,
+        gate,
+        stageId: stage.stageId,
+        approver,
+        currentStage: { stageId: stage.stageId, nodeIds: [...stage.nodeIds] },
+        completedStages: completedStages.map((entry) => ({
+          stageId: entry.stageId,
+          evidenceEventSeqs: [...entry.evidenceEventSeqs],
+        })),
+        upcomingStages,
+        gapSignals: [...gapSignals],
+        spendUsd: totalSpend,
+        clockMs,
+        modelByNode: runState.modelByNode,
+        ownerOfNode: nodeLabel,
+      });
+      const decision = decisionPort.resolveDecision(bundle);
       approvalCount += 1;
-      stageSeqs.push(
-        emit({
-          type: "approval-recorded",
-          atMs: clockMs,
-          node: edge.to,
-          detail: `Human ${nodeLabel(edge.to)} gate "${edge.notes ?? "approval"}": ${response}.`,
+      const response = decision.kind;
+      const eventSeq = emit({
+        type: "approval-recorded",
+        atMs: clockMs,
+        node: edge.to,
+        detail: `Human ${nodeLabel(edge.to)} gate "${gate}": ${response}.`,
+      });
+      stageSeqs.push(eventSeq);
+      const applied =
+        decision.kind === "redirect" ? applyRedirect(decision.redirect, runState, redirectDeps) : undefined;
+      if (applied) runState = applied.state;
+      decisionBundles.push({ eventSeq, bundle });
+      decisionTrail.push(
+        buildDecisionRecord({
+          gate,
+          nodeId: approver.nodeId,
+          role: approver.role,
+          eventSeq,
+          clockMs,
+          decision,
+          bundle,
+          ...(applied === undefined ? {} : { appliedRedirect: applied.application }),
         }),
       );
       if (response === "reject") {
@@ -271,10 +333,6 @@ export function runSimulation(
       }),
     );
     completedStages.push({ stageId: stage.stageId, evidenceEventSeqs: stageSeqs });
-    const index = stages.indexOf(stage);
-    const upcoming = stages
-      .slice(index + 1)
-      .map((entry) => ({ stageId: entry.stageId, nodeIds: [...entry.nodeIds] }));
     taskPlans.push(
       buildPlanUpdate({
         scenario,
@@ -285,7 +343,7 @@ export function runSimulation(
           stageId: entry.stageId,
           evidenceEventSeqs: [...entry.evidenceEventSeqs],
         })),
-        upcomingStages: upcoming,
+        upcomingStages,
         gapSignals: [...gapSignals],
         clockMs,
         ownerOfNode: nodeLabel,
@@ -332,32 +390,7 @@ export function runSimulation(
     ...(failureReason !== undefined ? { failureReason } : {}),
   };
   record.criteriaResults = evaluateCriteria(scenario, record, caughtDefects, invokedCapabilities);
-  return { ...record, replayHash: replayHash(record) };
-}
-
-function evaluateCriteria(
-  scenario: ScenarioDescriptor,
-  record: Omit<SimulationRunRecord, "replayHash" | "criteriaResults">,
-  caughtDefects: Set<string>,
-  invokedCapabilities: ReadonlySet<string>,
-): SimulationRunRecord["criteriaResults"] {
-  return scenario.successCriteria.map((criterion) => {
-    let met = false;
-    if (criterion.id === "goal-class-served") {
-      met = record.finished && record.gapSignals.length === 0 && record.artifacts.length > 0;
-    } else if (criterion.id === "no-capability-gaps") {
-      met = record.gapSignals.length === 0;
-    } else if (criterion.id === "all-defects-caught") {
-      met = scenario.defects.every((defect) => caughtDefects.has(defect.description));
-    } else if (criterion.id === "budget-adhered") {
-      met = record.telemetry.totalSpendUsd <= scenario.budgetEnvelopeUsd;
-    } else if (criterion.id === "reviews-completed") {
-      met = record.events.some((event) => event.type === "review-verdict");
-    } else if (criterion.id === "required-capabilities-invoked") {
-      met = (scenario.requiredCapabilities ?? []).every((capabilityId) =>
-        invokedCapabilities.has(capabilityId),
-      );
-    }
-    return { id: criterion.id, description: criterion.description, met };
-  });
+  // Determinism law (W6 §2): the decision-plane extensions ride alongside the
+  // hashed core — replayHash sees exactly the pre-W6 field set.
+  return { ...record, replayHash: replayHash(record), decisionBundles, decisionTrail };
 }

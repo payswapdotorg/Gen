@@ -16,6 +16,8 @@ import type {
   OrganizationGraph,
   SimulationRunRecord,
 } from "../contract.js";
+import type { SimulationRunRecordWithDecisions } from "../domain/simulation/decision-types.js";
+import type { SimulationConfig } from "../domain/simulation/engine.js";
 import type { OrganizationSearchRequest, OrganizationSearchResult } from "../domain/lab-api.js";
 import { DEFAULT_CERTIFICATION_BAR, DEFAULT_FITNESS_WEIGHTS } from "../domain/lab-api.js";
 import { searchOrganizations } from "../domain/search.js";
@@ -58,7 +60,11 @@ export interface EvaluationPipelineResult {
 
 export interface LabService {
   readonly search: (request: OrganizationSearchRequest) => OrganizationSearchResult;
-  readonly simulate: (scenario: ScenarioDescriptor, graph: OrganizationGraph) => SimulationRunRecord;
+  readonly simulate: (
+    scenario: ScenarioDescriptor,
+    graph: OrganizationGraph,
+    config?: SimulationConfig,
+  ) => SimulationRunRecordWithDecisions;
   readonly evaluate: (
     run: SimulationRunRecord,
     scenario: ScenarioDescriptor,
@@ -70,7 +76,7 @@ export interface LabService {
 export function createLabService(deps: LabServiceDeps = {}): LabService {
   return {
     search: (request) => searchOrganizations(request),
-    simulate: (scenario, graph) => runSimulation(scenario, graph),
+    simulate: (scenario, graph, config) => runSimulation(scenario, graph, config),
     evaluate: (run, scenario, weights) => evaluateRun(run, scenario, weights ?? DEFAULT_FITNESS_WEIGHTS),
     evaluateAndCertify: (options) => runPipeline(options, deps),
   };
