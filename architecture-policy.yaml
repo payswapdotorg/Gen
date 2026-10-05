@@ -108,7 +108,7 @@ modules:
   - id: creative-workspace
     roots: [apps/creative-workspace/src]
     managed: true
-    requires: [shared, media-capabilities, timeline, agent-lab, arena-bridge]
+    requires: [shared, media-capabilities, timeline, agent-lab, arena-bridge, media-providers]
     publicEntrypoints: [apps/creative-workspace/src/contract.ts]
     layers: { domain: domain, app: app, adapters: adapters, ui: ui }
     layerOrder: [domain, app, ui, adapters]
