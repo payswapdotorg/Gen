@@ -1,0 +1,19 @@
+{
+  "artifactId": "art.example-source-video",
+  "contentAddress": "sha256:6b6968146137ad28482725467c77d8a8b5e5fb9cb3aa23b30aa606beac1185be",
+  "mediaType": "video/mp4",
+  "producedBy": {
+    "capabilityId": "orchestration.ingest-media",
+    "executionAdapter": "workspace-ingest",
+    "executionId": "example-ingest-001"
+  },
+  "metadata": {
+    "durationSeconds": 8,
+    "resolution": "1920x1080",
+    "fps": 24
+  },
+  "storage": {
+    "storeRef": "examples/media/source-video.mp4",
+    "sizeBytes": 4194304
+  }
+}

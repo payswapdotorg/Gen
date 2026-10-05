@@ -1,0 +1,20 @@
+{
+  "artifactId": "art.timeline-run-0009",
+  "contentAddress": "sha256:d4d13338e92b4f03913909697426988abbf4d1179b67aef05bc8bcb7daea3982",
+  "mediaType": "application/vnd.gen.timeline-bundle+json",
+  "producedBy": {
+    "capabilityId": "orchestration.compose-timeline",
+    "executionId": "run-0009-compose-1",
+    "agentInstanceId": "run-0009-n1"
+  },
+  "derivedFrom": ["art.editor-project-cut-v1", "art.seg1-replaced-v1"],
+  "metadata": {
+    "fps": 25,
+    "resolution": "1280x720",
+    "trackCount": 1
+  },
+  "storage": {
+    "storeRef": "runs/run-0009/timelines/run-0009-v1.timeline-bundle.json",
+    "sizeBytes": 4096
+  }
+}

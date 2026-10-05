@@ -1,0 +1,20 @@
+{
+  "artifactId": "art.example-timeline-bundle",
+  "contentAddress": "sha256:c3a79639c61ac3593e5fdda93a42caca89fe2919b7de1f33ff3be0e57e261c6a",
+  "mediaType": "application/vnd.gen.timeline-bundle+json",
+  "producedBy": {
+    "capabilityId": "orchestration.compose-timeline",
+    "executionId": "example-compose-001",
+    "agentInstanceId": "example-run-n1"
+  },
+  "derivedFrom": ["art.example-editor-project"],
+  "metadata": {
+    "fps": 24,
+    "resolution": "1920x1080",
+    "trackCount": 1
+  },
+  "storage": {
+    "storeRef": "examples/timelines/example-bundle.json",
+    "sizeBytes": 2048
+  }
+}

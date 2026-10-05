@@ -1,0 +1,21 @@
+{
+  "artifactId": "art.src-segment-1",
+  "contentAddress": "sha256:6916f3b5416fbe75e227529e85d9a4668231cc5bdc3609c162f879462ea35f39",
+  "mediaType": "video/mp4",
+  "producedBy": {
+    "capabilityId": "editor.cut-video",
+    "providerId": "local-tools",
+    "executionAdapter": "mlt-melt-cli",
+    "executionId": "job-20261004-0001-pre"
+  },
+  "derivedFrom": ["art.src-video"],
+  "metadata": {
+    "durationSeconds": 24,
+    "resolution": "1280x720",
+    "fps": 25
+  },
+  "storage": {
+    "storeRef": "runs/run-0009/artifacts/src-segment-1.mp4",
+    "sizeBytes": 9216000
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "artifactId": "art.editor-project-cut-v1",
+  "contentAddress": "sha256:fceed04eea645701a6e97ba12ec2dd72b74a3deaa737b36ca9f4202f09caaefc",
+  "mediaType": "application/vnd.gen.editor-project",
+  "producedBy": {
+    "capabilityId": "editor.cut-video",
+    "providerId": "local-tools",
+    "executionAdapter": "mlt-melt-cli",
+    "executionId": "job-20261004-0001-cut"
+  },
+  "derivedFrom": ["art.src-video"],
+  "metadata": {
+    "editorId": "mlt",
+    "revision": 1,
+    "fps": 25,
+    "resolution": { "width": 1280, "height": 720 }
+  },
+  "storage": {
+    "storeRef": "runs/run-0009/projects/cut-v1.mlt",
+    "sizeBytes": 20480
+  }
+}
