@@ -9,6 +9,7 @@ export type {
   OrganizationSearchDimensions,
   OrganizationSearchResult,
   SearchCandidate,
+  SearchMethodOptions,
   FitnessWeights,
   EvaluationMetrics,
   CertificationBar,
@@ -32,6 +33,13 @@ export {
 } from "./domain/binding.js";
 export { validateOrganizationGraph } from "./domain/org-graph.js";
 export { searchOrganizations, DEFAULT_DIMENSIONS } from "./domain/search.js";
+export { runOrganizationSearch, registerSearchMethod, listSearchMethodNames } from "./domain/search/method-registry.js";
+export type {
+  SearchMethod,
+  SearchMethodName,
+  SearchMethodTelemetry,
+  MethodSearchResult,
+} from "./domain/search/method-types.js";
 export { ROLE_TEMPLATES, findRoleTemplate } from "./domain/search-templates.js";
 export { runSimulation } from "./domain/simulation/engine.js";
 export type { SimulationConfig } from "./domain/simulation/engine.js";

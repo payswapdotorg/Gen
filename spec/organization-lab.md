@@ -41,6 +41,15 @@ Search output = candidate `OrganizationGraph`s ranked by evaluation. The
 search engine itself is pluggable (rule-based first, learned later); the
 OUTPUT contract is fixed by the schema.
 
+### 2.1 Search-method registry (binding)
+
+The pluggable search engine is a method registry (W13): `request.method`
+selects the method (default `"rule"`); registered methods are `rule`,
+`beam`, `evolutionary`, `bandit`; new methods register via
+`registerSearchMethod` with zero caller changes. Every method is bound by
+the evaluation budget and writes search telemetry into the pipeline run
+record.
+
 ## 3. Simulation environment
 
 - Deterministic and replayable: seeded scenario, frozen capability mocks /
