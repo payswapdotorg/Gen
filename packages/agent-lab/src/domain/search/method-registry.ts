@@ -4,7 +4,12 @@
  * future learned/RL methods register without touching any caller (spec §2:
  * "rule-based first, learned later"; the OUTPUT contract stays frozen by the
  * schema). The four built-ins are registered up front; `registerSearchMethod`
- * returns an unregister handle for tests and plugins.
+ * returns an unregister handle for tests and plugins. W14 adds the learned
+ * method-selection policy (search/learned-method.ts) as the fifth built-in:
+ * it delegates per the committed selection ledger, and resolves its delegate
+ * through a resolver bound HERE (concrete methods never import the registry —
+ * no import cycle; the T5 probe-method path proved zero-caller-change
+ * registration long before this one).
  */
 import type { OrganizationSearchRequest } from "../lab-api.js";
 import type { MethodSearchResult, SearchMethod } from "./method-types.js";
@@ -12,6 +17,7 @@ import { ruleSearchMethod } from "./rule-method.js";
 import { beamSearchMethod } from "./beam-method.js";
 import { evolutionarySearchMethod } from "./evolutionary-method.js";
 import { banditSearchMethod } from "./bandit-method.js";
+import { bindLearnedMethodResolver, learnedSearchMethod } from "./learned-method.js";
 
 const registry = new Map<string, SearchMethod>();
 
@@ -48,8 +54,12 @@ export function runOrganizationSearch(request: OrganizationSearchRequest): Metho
   return method.search(request);
 }
 
-// Built-ins: rule first (the default), then the W13 methods.
+// Built-ins: rule first (the default), then the W13 methods, then the W14
+// learned policy (ledger-driven delegation; registered through the same
+// registerSearchMethod surface any plugin uses — zero caller changes).
+bindLearnedMethodResolver(getSearchMethod);
 registerSearchMethod(ruleSearchMethod);
 registerSearchMethod(beamSearchMethod);
 registerSearchMethod(evolutionarySearchMethod);
 registerSearchMethod(banditSearchMethod);
+registerSearchMethod(learnedSearchMethod);

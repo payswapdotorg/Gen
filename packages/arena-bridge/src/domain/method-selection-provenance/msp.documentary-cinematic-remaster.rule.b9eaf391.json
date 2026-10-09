@@ -1,0 +1,31 @@
+{
+  "provenanceId": "msp.documentary-cinematic-remaster.rule.b9eaf391",
+  "goalClass": "documentary-cinematic-remaster",
+  "method": "rule",
+  "seed": "search:documentary-cinematic-remaster:cheapest-reliable",
+  "candidatesConsidered": 32,
+  "candidatesEmitted": 32,
+  "evaluationsRun": 0,
+  "rankedBestFitness": 0.8398,
+  "certified": true,
+  "selectedAt": "2026-10-05T09:00:00.000Z",
+  "evidence": {
+    "ledgerRecordRef": "packages/agent-lab/src/domain/method-selection/records/sel.documentary-cinematic-remaster.rule.b9eaf391.json",
+    "telemetry": {
+      "method": "rule",
+      "seed": "search:documentary-cinematic-remaster:cheapest-reliable",
+      "candidatesConsidered": 32,
+      "candidatesEmitted": 32,
+      "evaluationsRun": 0
+    },
+    "certifiedEvaluationRef": "packages/agent-lab/src/domain/evaluations/eval.org.documentary-cinematic-remaster-cand-04.json",
+    "certifiedFitness": 0.8398
+  },
+  "lifecycle": {
+    "state": "published",
+    "certifiedAt": "2026-10-05T09:30:00.000Z",
+    "publishedAt": "2026-10-05T09:45:00.000Z"
+  },
+  "notes": "W14 provenance-ladder example: the vanilla rule-method pipeline run over documentary-cinematic-remaster (search → simulate → evaluate → certify). Real numbers from the committed ledger: 32 candidates considered and emitted, 0 internal evaluations (rule never evaluates), ranked best fitness 0.8398 — the committed T2 certified optimum (replayHash 3474f812). On the committed ledger this row ties with the evolutionary and bandit rows at 0.8398 and wins the learned policy's tie-break with 0 evaluationsRun.",
+  "generatedBy": "@gen/arena-bridge method-selection-provenance mapSelectionToProvenance"
+}

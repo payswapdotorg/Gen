@@ -2,7 +2,9 @@
  * Lab service (app layer): orchestrates the evaluation loop — search over the
  * five binding dimensions, deterministic simulation, fitness evaluation,
  * certification. Side effects (persisting evaluation records) go through the
- * EvaluationStore port only.
+ * EvaluationStore port only; side effects of the W14 flywheel (committing the
+ * per-goal-class method-selection record) go through the SelectionLedgerStore
+ * port — armed optionally, zero behavior change when absent.
  */
 import type {
   CertificationBar,
@@ -12,6 +14,7 @@ import type {
   EvaluationStore,
   FitnessWeights,
 } from "../domain/lab-api.js";
+import type { MethodSelectionRecord, SelectionLedgerStore } from "../domain/method-selection/selection-ledger.js";
 import type {
   OrganizationGraph,
   SimulationRunRecord,
@@ -20,6 +23,7 @@ import type { SimulationRunRecordWithDecisions } from "../domain/simulation/deci
 import type { SimulationConfig } from "../domain/simulation/engine.js";
 import type { OrganizationSearchRequest, OrganizationSearchResult } from "../domain/lab-api.js";
 import type { SearchMethodTelemetry } from "../domain/search/method-types.js";
+import type { MethodSearchResult } from "../domain/search/method-types.js";
 import { DEFAULT_CERTIFICATION_BAR, DEFAULT_FITNESS_WEIGHTS } from "../domain/lab-api.js";
 import { runOrganizationSearch } from "../domain/search/method-registry.js";
 import { runSimulation } from "../domain/simulation/engine.js";
@@ -29,6 +33,10 @@ import { certifyOrganization, withCertification } from "../domain/certification.
 
 export interface LabServiceDeps {
   readonly evaluationStore?: EvaluationStore;
+  /** W14 flywheel: when armed, every evaluateAndCertify run appends its
+   * per-goal-class method-selection record (the provenance step) to the
+   * committed ledger. Unarmed (default): zero behavior change. */
+  readonly selectionLedgerStore?: SelectionLedgerStore;
 }
 
 export interface EvaluationPipelineOptions {
@@ -124,6 +132,7 @@ function runPipeline(options: EvaluationPipelineOptions, deps: LabServiceDeps): 
   ranked.sort((a, b) => b.fitness - a.fitness || a.graph.id.localeCompare(b.graph.id));
   const best = ranked[0];
   if (!best) {
+    persistSelectionRecord(deps, options, searchOutcome, undefined, undefined);
     return { search, searchTelemetry: searchOutcome.telemetry, ranked, best: undefined, certifiedGraph: undefined, outcome: undefined, record: undefined };
   }
   const outcome = certifyOrganization({
@@ -146,5 +155,35 @@ function runPipeline(options: EvaluationPipelineOptions, deps: LabServiceDeps): 
   };
   deps.evaluationStore?.saveEvaluation(record);
   if (outcome.certified) deps.evaluationStore?.saveCertifiedOrganization(certifiedGraph);
+  persistSelectionRecord(deps, options, searchOutcome, best, outcome);
   return { search, searchTelemetry: searchOutcome.telemetry, ranked, best, certifiedGraph, outcome, record };
+}
+
+/**
+ * W14 flywheel hook: append the run's method-selection record (frozen fields
+ * from the search telemetry + the pipeline outcome; selectedAt is the run's
+ * deterministic evidence timestamp). No-op unless the ledger store is armed.
+ */
+function persistSelectionRecord(
+  deps: LabServiceDeps,
+  options: EvaluationPipelineOptions,
+  searchOutcome: MethodSearchResult,
+  best: RankedCandidate | undefined,
+  outcome: CertificationOutcome | undefined,
+): void {
+  if (!deps.selectionLedgerStore) return;
+  const budget = options.request.options?.evaluationBudget;
+  const selection: MethodSelectionRecord = {
+    goalClass: searchOutcome.goalClass,
+    method: searchOutcome.telemetry.method,
+    seed: searchOutcome.telemetry.seed,
+    ...(budget !== undefined ? { evaluationBudget: budget } : {}),
+    candidatesConsidered: searchOutcome.telemetry.candidatesConsidered,
+    candidatesEmitted: searchOutcome.telemetry.candidatesEmitted,
+    evaluationsRun: searchOutcome.telemetry.evaluationsRun,
+    ...(best !== undefined ? { rankedBestFitness: best.fitness } : {}),
+    ...(outcome !== undefined ? { certified: outcome.certified } : {}),
+    selectedAt: options.certifiedAt,
+  };
+  deps.selectionLedgerStore.appendSelection(selection);
 }
