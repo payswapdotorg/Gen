@@ -5,15 +5,15 @@
   "modeComparison": [
     {
       "mode": "cli",
-      "viability": "viable (declared; live run pending binary)",
-      "startupCost": { "class": "subsecond", "measuredMs": null, "note": "render executes via melt (kdenlive_render is a melt wrapper) — subsecond cold start declared, not measured (binaries absent). Structural pipeline measured: open 16.3ms (XML flavor build), apply(cut) 1.7ms, exportOtio 1.8ms." },
+      "viability": "viable (live-verified via melt)",
+      "startupCost": { "class": "subsecond", "measuredMs": 4, "note": "render executes via melt (kdenlive_render is a melt wrapper) — melt 7.30.0 live: -version cold start 4 ms (3 runs). Structural pipeline measured: open 16.3ms (XML flavor build), apply(cut) 1.7ms, exportOtio 1.8ms." },
       "determinism": "deterministic kdenlive-flavored MLT XML per revision; render via melt avformat consumer",
       "sandboxability": "high — project XML authoring is pure data; rendering is a plain process spawn; no GUI",
       "errorSurfacing": "exit code + stderr captured; XML parse failures are precise (path + problem), never guessed",
       "artifactFidelity": "frame-grid quantization (MLT semantics); kdenlive effect/keyframe model out of the declared subset (dropped on OTIO exchange — declared)",
       "evidence": [
         { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (kdenlive cut + import of mlt composite projection, passed)" },
-        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (kdenlive live render — SKIPPED, binaries absent)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (kdenlive live render — PASSED, melt 7.30.0 present)" },
         { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
       ]
     },
@@ -37,7 +37,7 @@
     { "capabilityId": "editor.cut-video", "maturity": "stable" },
     { "capabilityId": "editor.render-project", "maturity": "stable" }
   ],
-  "binaryNames": ["kdenlive_render", "melt"],
-  "liveConformance": "skipped (kdenlive_render and melt absent in Phase 1 sandbox); structural + OTIO conformance passed",
-  "caveats": "kdenlive XML flavor (main_bin doc properties, kdenlive:clipname, kdenlive:track_name) targets kdenlive 24.x documents; verify against a real kdenlive save at the integration station"
+  "binaryNames": ["melt", "kdenlive_render"],
+  "liveConformance": "live-verified via melt 7.30.0 (kdenlive_render absent by design — the render plan argv is melt-shaped, so melt is probed first); XML-flavored render scenario passes in editor-live.test.ts (suite 48/48); structural + OTIO conformance passed",
+  "caveats": "kdenlive XML flavor (main_bin doc properties, kdenlive:clipname, kdenlive:track_name) targets kdenlive 24.x documents; diff against a real kdenlive GUI save remains open (deferred — requires the kdenlive GUI app, not renderable headless)"
 }

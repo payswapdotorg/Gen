@@ -89,6 +89,34 @@ describe("blender live: editor.render-project (headless python)", { skip: !(awai
   });
 });
 
+describe("blender live: editor.render-project png-sequence (##### pattern)", { skip: !(await binariesPresent(["blender"])) }, () => {
+  test("blender writes the declared frame files and the render registers the artifact", async () => {
+    const workspace = await makeWorkspace();
+    try {
+      const artifactId = await ingestFixture(workspace, "blender-png-fixture.mp4");
+      const adapter = createEditorAdapter("blender", workspace.ctx);
+      const handle = await adapter.open(artifactId);
+      // Plan: outputRelativePath is the PNG sequence declaration (first frame
+      // "render/frame00001.png"); the ##### filepath pattern makes Blender emit
+      // frame00001.png, frame00002.png, … — this locks the W12 sequence fix.
+      const job = await adapter.render(handle, { format: "png-sequence", outArtifactMediaType: "image/png" });
+      const status = await pollToTerminal(adapter, job);
+      assert.equal(status, "succeeded");
+      const result = await adapter.jobResult(job);
+      assert.equal(result.outputArtifactIds.length, 1, "png-sequence render must register its output artifact");
+      for (const frame of ["frame00001.png", "frame00002.png"]) {
+        const framePath = workspace.ctx.fs.join(handle.workingDir, "render", frame);
+        assert.ok(await workspace.ctx.fs.exists(framePath), `declared frame file missing: ${frame}`);
+      }
+      const firstFrame = await workspace.ctx.fs.readBinary(workspace.ctx.fs.join(handle.workingDir, "render", "frame00001.png"));
+      assert.ok(firstFrame.length >= 4, "frame00001.png is truncated");
+      assert.deepEqual(Array.from(firstFrame.slice(0, 4)), [0x89, 0x50, 0x4e, 0x47], "frame00001.png must carry the PNG magic header");
+    } finally {
+      await workspace.cleanup();
+    }
+  });
+});
+
 describe("natron live: editor.composite-layer (NatronRenderer script)", { skip: !(await binariesPresent(["NatronRenderer", "natron"])) }, () => {
   test("NatronRenderer executes the generated composite script", async () => {
     const workspace = await makeWorkspace();
@@ -99,6 +127,42 @@ describe("natron live: editor.composite-layer (NatronRenderer script)", { skip: 
       const job = await adapter.render(handle, { format: "mp4", outArtifactMediaType: "video/mp4" });
       const status = await pollToTerminal(adapter, job);
       assert.equal(status, "succeeded");
+    } finally {
+      await workspace.cleanup();
+    }
+  });
+});
+
+describe("natron live: WriteFFmpeg codec/format selection from the render spec", { skip: !(await binariesPresent(["NatronRenderer", "natron"])) }, () => {
+  test("render spec { format: mp4, codec: mpeg4 } selects the container + codec (ffprobe-verified)", async () => {
+    const workspace = await makeWorkspace();
+    try {
+      const artifactId = await ingestFixture(workspace, "natron-codec-fixture.mp4");
+      const adapter = createEditorAdapter("natron", workspace.ctx);
+      const handle = await adapter.open(artifactId);
+      // WriteFFmpeg (2.4.4, live-probed param surface) exposes Choice params
+      // `format` (default/avi/flv/matroska/mov/mp4/…) and `codec`
+      // (…/mpeg4/libx264/…); the generated script maps the option NAME to its
+      // index via getOptions(). This scenario asserts the selection landed in
+      // the encoded bytes, not just in the script.
+      const job = await adapter.render(handle, { format: "mp4", codec: "mpeg4", outArtifactMediaType: "video/mp4" });
+      const status = await pollToTerminal(adapter, job);
+      assert.equal(status, "succeeded");
+      const output = workspace.ctx.fs.join(handle.workingDir, "render", "output.mp4");
+      const probe = await workspace.ctx.process.run("ffprobe", [
+        "-v", "error",
+        "-show_entries", "stream=codec_name:format=format_name",
+        "-of", "json",
+        output,
+      ]);
+      assert.equal(probe.exitCode, 0, probe.stderr.slice(0, 300));
+      const parsed = JSON.parse(probe.stdout) as { streams?: { codec_name?: string }[]; format?: { format_name?: string } };
+      const video = parsed.streams?.find((stream) => stream.codec_name !== undefined);
+      assert.equal(video?.codec_name, "mpeg4", `encoded codec must match the selected WriteFFmpeg codec (got ${video?.codec_name ?? "none"})`);
+      const containers = (parsed.format?.format_name ?? "").split(",");
+      assert.ok(containers.includes("mp4"), `container must match the selected WriteFFmpeg format (got ${parsed.format?.format_name ?? "none"})`);
+      const result = await adapter.jobResult(job);
+      assert.equal(result.outputArtifactIds.length, 1, "codec-selection render must register its output artifact");
     } finally {
       await workspace.cleanup();
     }
