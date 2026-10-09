@@ -4,10 +4,36 @@
  * Re-exported through contract.ts; pure data types, no IO.
  */
 import type { OrganizationGraph, LabCatalogs } from "../contract.js";
+import type { ScenarioDescriptor } from "./simulation/scenario-types.js";
+import type { BodyRegistry } from "./bodies/registry.js";
 
 export type AllocationPolicy = "premium-first" | "cheapest-reliable" | "quality-first";
 
-/** Rule-based search request (organization-lab §2 — the five binding dimensions). */
+/** Per-method search knobs (W13 pluggable search; defaults are method-specific). */
+export interface SearchMethodOptions {
+  /** Beam width K (beam method): survivors kept per level. Default 4. */
+  readonly beamWidth?: number;
+  /** Evolutionary population size. Default 8. */
+  readonly populationSize?: number;
+  /** Evolutionary generation budget. Default 3. */
+  readonly generations?: number;
+  /** Hard cap on full candidate evaluations (one evaluation = the candidate
+   * simulated on every attached scenario). Bounds beam survivor evaluations,
+   * evolutionary generations and bandit rollouts. */
+  readonly evaluationBudget?: number;
+  /** Bandit rollout budget (pulls). Default 24. Also capped by evaluationBudget. */
+  readonly rolloutBudget?: number;
+  /** Bandit UCB exploration constant c. Default √2. */
+  readonly explorationConstant?: number;
+}
+
+/**
+ * Search request over the five binding dimensions (organization-lab §2).
+ * The engine is pluggable (W13): `method` selects the registered search
+ * method (default "rule" — behavior-identical to the original engine);
+ * fitness-driven methods (beam survivors, evolutionary, bandit) consume the
+ * optional scenarios/weights as their evaluation oracle.
+ */
 export interface OrganizationSearchRequest {
   readonly goal: string;
   readonly goalClass: string;
@@ -16,6 +42,18 @@ export interface OrganizationSearchRequest {
   readonly budgetEnvelopeUsd: number;
   readonly dimensions?: Partial<OrganizationSearchDimensions>;
   readonly maxCandidates?: number;
+  /** Search-method selection via the registry (W13). Default "rule". */
+  readonly method?: string;
+  /** Deterministic seed for PRNG-driven methods (rule ignores it). */
+  readonly seed?: string;
+  readonly options?: SearchMethodOptions;
+  /** Evaluation oracle for fitness-driven methods: simulate each candidate
+   * on these scenarios (deterministic, seeded — organization-lab §3). */
+  readonly scenarios?: readonly ScenarioDescriptor[];
+  /** Fitness weights for method-internal evaluation (default: spec weights). */
+  readonly weights?: FitnessWeights;
+  /** Body-registry injection point (defaults to the shared built-in registry). */
+  readonly bodyRegistry?: BodyRegistry;
 }
 
 export interface OrganizationSearchDimensions {
@@ -30,6 +68,9 @@ export interface SearchCandidate {
   readonly graph: OrganizationGraph;
   readonly preScore: number;
   readonly dimensionChoices: Readonly<Record<string, string>>;
+  /** Mean simulated fitness when a method internally evaluated this candidate
+   * on the request's scenarios (W13); absent otherwise — never fabricated. */
+  readonly evaluatedFitness?: number;
 }
 
 export interface OrganizationSearchResult {
