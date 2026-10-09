@@ -5,15 +5,15 @@
   "modeComparison": [
     {
       "mode": "cli",
-      "viability": "viable per declared contract (live run pending binary — NatronRenderer/natron absent in Phase 1 sandbox)",
-      "startupCost": { "class": "seconds", "measuredMs": null, "note": "not measured (binary absent). NatronRenderer is a full compositing engine — startup is seconds-class, declared. Structural pipeline measured: open 1.3ms, exportOtio 1.3ms." },
-      "determinism": "deterministic generated Python script (Read→Transform→Merge→Write graph) per revision; render determinism unverified without the binary",
+      "viability": "viable (live-verified — NatronRenderer 2.4.4)",
+      "startupCost": { "class": "seconds", "measuredMs": 10, "note": "NatronRenderer 2.4.4 live: --version cold start 11/10/10 ms (mean 10, 3 runs; exits 1 after printing — quirk of the binary, not a failure). Structural pipeline measured: open 1.3ms, exportOtio 1.3ms." },
+      "determinism": "deterministic generated Python script (Read→Transform→Merge→Write graph) per revision; render determinism verified live on 2.4.4 (script executes and registers the declared output)",
       "sandboxability": "high — NatronRenderer is the documented headless binary; cwd-scoped; no GUI",
       "errorSurfacing": "exit code + stdout/stderr captured; Python exceptions inside the script appear in stderr and fail the job",
       "artifactFidelity": "layer-stack model (not timeline-oriented): record placement beyond the composite stack is dropped, transform x/y/scale/rotation map to the Transform node — declared in codec fidelity notes",
       "evidence": [
         { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (natron import of ffmpeg-exported OTIO, passed)" },
-        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (natron live composite — SKIPPED, binaries absent)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (natron live composite — PASSED, NatronRenderer 2.4.4 present)" },
         { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
       ]
     },
@@ -37,6 +37,6 @@
     { "capabilityId": "editor.composite-layer", "maturity": "experimental" }
   ],
   "binaryNames": ["NatronRenderer", "natron"],
-  "liveConformance": "skipped (binaries absent); plugin ids (fr.inria.natron.Read/Merge/Transform/Write) target Natron 2.x per the declared contract — unverified against a live binary, honestly recorded",
-  "caveats": "script API surface declared from Natron 2.x documentation; first live run at the integration station must confirm createNode ids and param names before this mapping may leave experimental"
+  "liveConformance": "live-verified (NatronRenderer 2.4.4, W11/W12): composite render scenario passes in editor-live.test.ts (suite 48/48); plugin ids are fr.inria.openfx.ReadFFmpeg / net.sf.openfx.TransformPlugin / net.sf.openfx.MergePlugin / fr.inria.openfx.WriteFFmpeg — the legacy fr.inria.natron.* ids return None from createNode on 2.4.4",
+  "caveats": "createNode ids and the WriteFFmpeg param surface (format/codec/fps, enumerated live via getParams()) are confirmed against the 2.4.4 binary; leaving experimental maturity is a TL decision"
 }

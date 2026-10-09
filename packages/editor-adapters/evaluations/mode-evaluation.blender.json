@@ -5,15 +5,15 @@
   "modeComparison": [
     {
       "mode": "cli",
-      "viability": "viable (declared; live run pending binary)",
-      "startupCost": { "class": "seconds", "measuredMs": null, "note": "blender binary absent in Phase 1 sandbox. Blender --background cold start is seconds-class (Python interpreter + bpy init) — declared, not measured. Structural pipeline measured: open 1.4ms, exportOtio 1.5ms; script generation is pure string building (no process)." },
+      "viability": "viable (live-verified)",
+      "startupCost": { "class": "seconds", "measuredMs": 101, "note": "blender 4.3.2 live: --version cold start 108/95/101 ms (mean 101, 3 runs); --background --python scene init ~334 ms (2 runs) — the seconds-class estimate was pessimistic, the real render-path startup is sub-second for an empty scene. Structural pipeline measured: open 1.4ms, exportOtio 1.5ms; script generation is pure string building (no process)." },
       "determinism": "deterministic script + JSON bundle per revision; render determinism depends on Blender's animation system (stable for VSE strips)",
       "sandboxability": "high — --background is the documented headless mode; cwd-scoped; no GUI, no network",
       "errorSurfacing": "exit code + full stdout/stderr captured; the generated script writes tracking.json reporting what the headless run actually achieved (never fabricated)",
       "artifactFidelity": "frame-grid quantization; VSE strip transform carries offset/scale (rotation declared); tracking ops are blender-native extensions (dropped on OTIO export — declared)",
       "evidence": [
         { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/otio-roundtrip.test.ts (blender animation round-trip + import into all editors, passed)" },
-        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (blender live render — SKIPPED, blender absent)" },
+        { "kind": "test-run", "ref": "packages/editor-adapters/src/tests/editor-live.test.ts (blender live render — PASSED, blender 4.3.2 present; mp4 render + PNG-sequence scenarios)" },
         { "kind": "measurement", "ref": "evaluations/README.md measurement transcript (structural op timings)" }
       ]
     },
@@ -40,5 +40,5 @@
     { "capabilityId": "editor.track-object", "maturity": "experimental" }
   ],
   "binaryNames": ["blender"],
-  "liveConformance": "skipped (blender absent in Phase 1 sandbox); structural + OTIO conformance passed; see gap.editor-track-object-launch-coverage"
+  "liveConformance": "live-verified (blender 4.3.2, W11/W12): VSE mp4 render (frames0001.mp4 literal filepath) and PNG-sequence (##### pattern → frame00001.png…) scenarios pass in editor-live.test.ts (suite 48/48); structural + OTIO conformance passed; see gap.editor-track-object-launch-coverage"
 }

@@ -8,24 +8,29 @@ artifact fidelity. One record per editor: `mode-evaluation.<editor>.json`.
 ## Method (honest numbers only — lock P5)
 
 - **Structural measurements** (open / apply / exportOtio) run against the
-  real adapter classes over Node ports in the Phase 1 sandbox — no binaries
-  needed; these are adapter-pipeline costs, not editor-engine costs.
-- **Live measurements** exist only where binaries exist. Phase 1 sandbox
-  binary presence (snapshot from the executed test run):
+  real adapter classes over Node ports — no binaries needed; these are
+  adapter-pipeline costs, not editor-engine costs.
+- **Live measurements** exist where binaries exist. Current live-verified
+  station state (W11/W12 bring-up, re-verified in W15):
 
-  | editor | binary | present in sandbox |
-  |---|---|---|
-  | ffmpeg | ffmpeg, ffprobe | **yes** |
-  | mlt | melt | no |
-  | blender | blender | no |
-  | natron | NatronRenderer, natron | no |
-  | kdenlive | kdenlive_render, melt | no |
-  | losslesscut | (no headless surface) | n/a — gap report |
+  | editor | binary | version | verified live |
+  |---|---|---|---|
+  | ffmpeg | ffmpeg, ffprobe | 7.1.5 | **yes** — live cut/render scenarios |
+  | mlt | melt | 7.30.0 | **yes** — live avformat render scenario |
+  | blender | blender | 4.3.2 | **yes** — live VSE mp4 + PNG-sequence scenarios |
+  | natron | NatronRenderer | 2.4.4 | **yes** — live composite + WriteFFmpeg codec/format scenarios |
+  | kdenlive | melt (kdenlive_render absent by design) | 7.30.0 | **yes** — live XML-flavor render via melt |
+  | losslesscut | (no headless surface) | n/a | n/a — ADAPTER_ONLY by design (gap report) |
 
-- Where a binary is absent, the record says **declared, not measured** and
-  the live conformance scenario is **skipped** (never claimed). The same
-  scenarios execute at the integration station where binaries exist
-  (src/tests/editor-live.test.ts self-gates on binary presence).
+  The Phase 1 snapshot (all-but-ffmpeg absent) was superseded by the
+  W11/W12 bring-up; the per-editor JSON records carry the live-verified
+  truth (measured startup costs, liveConformance, evidence refs).
+
+- Where a headless surface does not exist (losslesscut), the record says
+  **declared, not measured** and stays ADAPTER_ONLY — GUI automation is
+  prohibited (lock P5) and is not implemented in any form. The live
+  scenarios (src/tests/editor-live.test.ts) self-gate on binary presence,
+  so they keep executing wherever the binaries exist.
 
 ## Measurement transcript (Phase 1 sandbox, 2026-10-04, Node 24)
 
@@ -40,7 +45,7 @@ kdenlive    open 16.3ms  apply(cut) 1.7ms   exportOtio 1.8ms
 losslesscut open 1.2ms   apply(cut) 1.2ms   exportOtio 1.2ms
 ```
 
-ffmpeg live (only live-capable editor in this sandbox):
+ffmpeg live (Phase 1):
 
 ```
 ffmpeg -version cold start ............ 56.8–74.8 ms (3 runs)
@@ -50,12 +55,46 @@ live cut+render (0.5–1.5s reencode,
   320x240, end-to-end incl. spawn) .... 107 ms, status=succeeded
 ```
 
+Live station cold starts (W15 re-measure, 3 runs each):
+
+```
+melt -version .......................... 4 ms (4/4/4)
+blender --version ....................... 108/95/101 ms (mean 101)
+blender --background --python (scene) .. ~334 ms
+NatronRenderer --version ............... 11/10/10 ms (mean 10; exits 1
+                                           after printing — binary quirk,
+                                           not a failure)
+```
+
+## Bring-up notes (live station, no-root)
+
+1. **Natron 2.4.4 no-installer tarball SHIPS `lib/libQtCore.so.4`** — the
+   current Linux-x86_64-no-installer.tar.xz asset is self-contained on the
+   Qt4 front. The Qt4 installer-recovery procedure (fetching Qt4 libs from
+   older asset archives) is only needed for older assets, not for 2.4.4.
+   The remaining no-root gap is GL: `libglu1-mesa` + `libopengl0` debs
+   extracted into a GL prefix and exposed via LD_LIBRARY_PATH in the
+   NatronRenderer shim.
+2. **ProcessPort contract: child env `PWD` must match child cwd.** Blender
+   4.3.2 resolves a relative `--python` path against the inherited `$PWD`
+   environment variable, not getcwd() — a spawned child whose cwd is set
+   but whose env still carries the parent's `PWD` fails to find the render
+   script. NodeProcessPort.spawnEnv() therefore overrides `PWD` to the
+   child cwd at both spawn sites (run + start). This is a standing
+   contract for any future ProcessPort implementation.
+3. melt 7.30.0 runs from extracted Debian trixie debs (melt + libmlt7 +
+   libmlt-data) via a shim that sets `LD_LIBRARY_PATH` (prefix libs),
+   `MLT_DATA` (prefix share/mlt-7) and `MLT_REPOSITORY` (prefix
+   lib/x86_64-linux-gnu/mlt-7).
+
 ## Headline findings
 
 1. **CLI is the right launch mode for all six editors** — it is the only
    mode every editor family actually exposes headless (melt, blender
    --background, ffmpeg, NatronRenderer, kdenlive project-XML+melt), and it
    gives uniform sandboxability + error surfacing through one ProcessPort.
+   Five of six are now LIVE-VERIFIED on that surface (losslesscut has no
+   headless surface — by design).
 2. **embedded** is only credible for MLT (libmlt++) and ffmpeg (bindings) —
    both deferred: process isolation beats in-process codec-crash risk at
    Phase 1 scale.

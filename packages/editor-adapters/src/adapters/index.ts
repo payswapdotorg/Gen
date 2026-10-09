@@ -60,8 +60,8 @@ export class NatronEditorAdapter extends BaseEditorAdapter {
 export class KdenliveEditorAdapter extends BaseEditorAdapter {
   readonly editorId: EditorId = "kdenlive";
   readonly mode = "cli" as const;
-  /** melt renders kdenlive (MLT) projects; kdenlive_render is the wrapper alternative. */
-  protected readonly binaryNames = ["kdenlive_render", "melt"] as const;
+  /** melt renders kdenlive (MLT) projects — the plan argv is melt-shaped; kdenlive_render is the wrapper alternative. */
+  protected readonly binaryNames = ["melt", "kdenlive_render"] as const;
 
   constructor(ctx: EditorAdapterContext) {
     super(ctx, createKdenliveCodec());

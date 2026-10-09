@@ -23,10 +23,20 @@ import type {
 import type { ArtifactDescriptor } from "@gen/timeline";
 
 export class NodeProcessPort implements ProcessPort {
+  /**
+   * Child env for spawn: when a cwd is set, PWD must match it — children
+   * that resolve relative paths against the inherited $PWD (Blender 4.3.2
+   * resolves a relative --python path against $PWD, not getcwd()) would
+   * otherwise read the parent's working directory.
+   */
+  private spawnEnv(cwd?: string): NodeJS.ProcessEnv {
+    return cwd === undefined ? process.env : { ...process.env, PWD: cwd };
+  }
+
   async run(command: string, args: readonly string[], options?: { cwd?: string; timeoutMs?: number }): Promise<ProcessResult> {
     const started = Date.now();
     return new Promise<ProcessResult>((resolve) => {
-      const child = spawn(command, args, { cwd: options?.cwd, stdio: ["ignore", "pipe", "pipe"] });
+      const child = spawn(command, args, { cwd: options?.cwd, env: this.spawnEnv(options?.cwd), stdio: ["ignore", "pipe", "pipe"] });
       let stdout = "";
       let stderr = "";
       const timer =
@@ -54,7 +64,7 @@ export class NodeProcessPort implements ProcessPort {
 
   async start(command: string, args: readonly string[], options?: { cwd?: string }): Promise<SpawnedProcess> {
     const started = Date.now();
-    const child = spawn(command, args, { cwd: options?.cwd, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(command, args, { cwd: options?.cwd, env: this.spawnEnv(options?.cwd), stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
     let exited = false;
