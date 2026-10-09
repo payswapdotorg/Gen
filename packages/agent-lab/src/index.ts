@@ -40,6 +40,34 @@ export type {
   SearchMethodTelemetry,
   MethodSearchResult,
 } from "./domain/search/method-types.js";
+export {
+  learnedSearchMethod,
+  armLearnedMethodLedger,
+  bindLearnedMethodResolver,
+} from "./domain/search/learned-method.js";
+export type {
+  MethodResolver,
+  SelectionLedgerSource,
+} from "./domain/search/learned-method.js";
+export type {
+  MethodRankingEntry,
+  MethodSelectionRecord,
+  MethodSelectionRecordInput,
+  SelectionAppendResult,
+  SelectionLedgerStore,
+  SelectionRecordIdentity,
+} from "./domain/method-selection/selection-ledger.js";
+export {
+  DEFAULT_SELECTION_METHOD,
+  LEARNED_METHOD_NAME,
+  MethodSelectionRecordSchema,
+  appendSelectionRecord,
+  rankMethodsForGoalClass,
+  selectBestMethod,
+  selectionRecordFingerprint,
+  selectionRecordId,
+  selectionRecordKey,
+} from "./domain/method-selection/selection-ledger.js";
 export { ROLE_TEMPLATES, findRoleTemplate } from "./domain/search-templates.js";
 export { runSimulation } from "./domain/simulation/engine.js";
 export type { SimulationConfig } from "./domain/simulation/engine.js";
@@ -97,4 +125,10 @@ export {
   readEvaluationRecordFile,
   readOrganizationGraphFile,
 } from "./adapters/fs-evaluation-store.js";
+export {
+  committedSelectionRecordsDir,
+  createFsSelectionLedgerStore,
+  listSelectionRecordFiles,
+  readSelectionRecordFile,
+} from "./adapters/fs-selection-ledger-store.js";
 export { registryViewToCapabilityCatalog } from "./adapters/registry-catalog-adapter.js";

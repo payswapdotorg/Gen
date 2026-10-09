@@ -1,0 +1,12 @@
+{
+  "goalClass": "documentary-cinematic-remaster",
+  "method": "learned",
+  "seed": "w14-ledger",
+  "evaluationBudget": 12,
+  "candidatesConsidered": 32,
+  "candidatesEmitted": 32,
+  "evaluationsRun": 0,
+  "rankedBestFitness": 0.8398,
+  "certified": true,
+  "selectedAt": "2026-10-05T09:20:00.000Z"
+}

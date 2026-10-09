@@ -41,3 +41,34 @@ export {
 export type { ArenaService, ArenaServiceDeps } from "./app/arena-service.js";
 export { createArenaService, catalogWithPublication } from "./app/arena-service.js";
 export { createFsGapStore, readGapReport, readTransitionLog } from "./adapters/fs-gap-store.js";
+export type {
+  MethodSelectionEvidenceChain,
+  MethodSelectionLedgerEntry,
+  MethodSelectionLedgerEntryInput,
+  MethodSelectionProvenanceInput,
+  MethodSelectionProvenanceRecord,
+  MethodSelectionProvenanceState,
+  ProvenanceTelemetry,
+} from "./domain/schema/method-selection-provenance.js";
+export {
+  MethodSelectionEvidenceChainSchema,
+  MethodSelectionLedgerEntrySchema,
+  MethodSelectionProvenanceSchema,
+  MethodSelectionProvenanceStateSchema,
+  ProvenanceTelemetrySchema,
+} from "./domain/schema/method-selection-provenance.js";
+export type {
+  MethodSelectionProvenanceMappingInput,
+  ProvenanceMappingResult,
+  ProvenanceTransitionResult,
+} from "./domain/method-selection-provenance.js";
+export {
+  PROVENANCE_CHAIN,
+  PROVENANCE_TERMINAL_STATES,
+  canTransitionProvenance,
+  certifyProvenance,
+  isProvenanceTerminal,
+  mapSelectionToProvenance,
+  provenanceIdOf,
+  publishProvenance,
+} from "./domain/method-selection-provenance.js";

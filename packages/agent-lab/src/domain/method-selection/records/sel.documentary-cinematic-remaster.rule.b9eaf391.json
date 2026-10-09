@@ -1,0 +1,11 @@
+{
+  "goalClass": "documentary-cinematic-remaster",
+  "method": "rule",
+  "seed": "search:documentary-cinematic-remaster:cheapest-reliable",
+  "candidatesConsidered": 32,
+  "candidatesEmitted": 32,
+  "evaluationsRun": 0,
+  "rankedBestFitness": 0.8398,
+  "certified": true,
+  "selectedAt": "2026-10-05T09:00:00.000Z"
+}
