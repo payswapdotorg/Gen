@@ -1,4 +1,4 @@
-# Creative acceptance battery — T1–T4
+# Creative acceptance battery — T1–T5
 
 The program's definition of done (ARCHITECTURE_LOCK.md §9), exercised twice
 per test: once at the **domain layer** (the pure decision functions over the
@@ -59,6 +59,16 @@ Committed records only — no fixtures, no network, no secrets (lock §8, P8).
 | Domain | `t4-gap-report.test.ts` | A routing failure produces a traceable failure; the committed forced-failure gap report is schema-valid; the arena state machine advances through certification and publishing into the registry/catalog; unresolved gaps refuse availability. |
 | End-to-end | `t4-end-to-end.test.ts` | The forced failure → gap report → workspace `forced-failure` blocked view: the blocked item links the REAL committed gap report (arena state, severity, router trace, source path), the mounted run is the run the gap cites (`organizationRunRef` parity, gap-signaled events), certification is honestly refused with the committed refusal record, and a completed item's artifact ref yields a timeline lineage evidence descriptor — the P4 tie-in: what made this, with which capability/provider (`art.seg1-replaced-v1` → `video.character-replacement` / higgsfield / genjutsu). |
 
+## T5 — search-method pluggability (W13 registry, W17 battery)
+
+> organization-lab §2.1: the search engine is a pluggable method registry —
+> determinism, budget, and telemetry are binding laws, not hints.
+
+| Layer | File | What it proves |
+|---|---|---|
+| Domain | `t5-search-method-pluggability.test.ts` | A registered custom method dispatches by `request.method` with zero caller changes (unregister restores); same-seed determinism is byte-equality on output AND telemetry (`wallTimeMs` excluded); evolutionary seed-sensitivity is real, beam is seed-independent; the budget law binds every method (3 ≤ cap < unbounded); telemetry carries the frozen public key set; unknown methods fail loudly; built-ins register in spec §2.1 order with `rule` as the default. |
+| End-to-end | `t5-end-to-end.test.ts` | The evaluation pipeline carries `searchTelemetry` (frozen keys) for every method; the rule-parity anchor — evolutionary at budget 24 finds the committed optimum (fitness 0.8398, replayHash `3474f812`); `evaluationBudget` caps the pipeline end-to-end; same-seed runs certify the identical graph with deep-equal telemetry (`wallTimeMs` excluded). |
+
 ## Harness layout
 
 ```
@@ -71,6 +81,8 @@ scripts/creative/acceptance/
 ├── t3-end-to-end.test.ts                # T3 e2e  (cost-aware routing → open/local path + provenance)
 ├── t4-gap-report.test.ts                # T4 domain
 ├── t4-end-to-end.test.ts                # T4 e2e  (forced failure → gap report → blocked view + descriptor)
+├── t5-search-method-pluggability.test.ts # T5 domain (registry laws: pluggability, determinism, budget, telemetry)
+├── t5-end-to-end.test.ts                # T5 e2e  (pipeline telemetry, rule-parity anchor, budget cap, twin runs)
 ├── lib/
 │   ├── compose-registry.ts              # the canonical registry index (media + editor + Arena extras)
 │   ├── plane.ts                         # the provider plane (providers + local tools + evaluations) → routing facts
